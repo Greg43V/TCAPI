@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Event — Grove Event Corp</title>
+<meta name="description" content="Live package pricing and official tickets for major sporting events — Grove Event Corp (Pty) Ltd." />
+<style>
+  /* ---- Brand tokens (matched to grovecorp.org — adjust to your exact CSS once the
+         repo/host is available so this is pixel-identical) ---- */
+  :root{
+    --ink:#0c0c0c;          /* near-black */
+    --paper:#ffffff;
+    --bone:#f6f5f1;         /* off-white section */
+    --green:#0a5c36;        /* Springbok green */
+    --gold:#c8a24a;         /* gold accent */
+    --line:#e4e2db;
+    --muted:#6b6b66;
+    --display:"Georgia","Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+
+  /* header */
+  header{border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-family:var(--display);font-weight:600;letter-spacing:.2px;font-size:19px}
+  .back{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+  .back:hover{color:var(--ink)}
+
+  /* eyebrow tag — echoes the site's "Admit · EPL · Official" style */
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600}
+  .eyebrow .dot{color:var(--gold);margin:0 6px}
+
+  /* hero */
+  .hero{padding:56px 0 32px}
+  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,5vw,52px);line-height:1.05;margin:14px 0 10px}
+  .hero h1 em{font-style:italic;color:var(--green)}
+  .meta{color:var(--muted);font-size:15px}
+  .from{margin-top:22px;display:inline-flex;align-items:baseline;gap:10px}
+  .from .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .from .amt{font-family:var(--display);font-size:34px;font-weight:600}
+
+  /* price table */
+  section.prices{padding:8px 0 48px}
+  .card{border:1px solid var(--line);border-radius:2px;overflow:hidden}
+  .card h2{margin:0;padding:18px 22px;font-family:var(--display);font-size:18px;font-weight:600;border-bottom:1px solid var(--line);background:var(--bone)}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:15px 22px;font-size:15px;border-bottom:1px solid var(--line)}
+  th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  td.price{font-family:var(--display);font-weight:600;white-space:nowrap}
+  td.qty{color:var(--muted);white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  .cta-row td{padding:0}
+  .enquire{display:inline-block;margin:0;padding:9px 16px;background:var(--green);color:#fff;text-decoration:none;font-size:13px;letter-spacing:.04em;border-radius:2px}
+  .enquire:hover{background:#084b2c}
+
+  /* states */
+  .note{color:var(--muted);font-size:13px;margin-top:16px}
+  .soldout{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9a3b2f;border:1px solid #e6c9c3;border-radius:2px;padding:3px 8px}
+  .loading,.error{padding:40px 22px;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:2px}
+  .error{color:#9a3b2f;border-color:#e6c9c3}
+
+  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <span class="brand">Grove Event Corp</span>
+    <a class="back" href="/#packages">← All packages</a>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <div class="hero">
+    <div class="eyebrow" id="eyebrow">International <span class="dot">·</span> Football <span class="dot">·</span> Official</div>
+    <h1 id="title">Loading event…</h1>
+    <div class="meta" id="meta"></div>
+    <div class="from" id="from" hidden>
+      <span class="label">Packages from</span>
+      <span class="amt" id="fromAmt"></span>
+    </div>
+  </div>
+
+  <section class="prices">
+    <div id="board" class="loading">Fetching live prices…</div>
+    <p class="note" id="note" hidden>
+      Prices are live from our supplier and shown per ticket, package inclusive. Availability and price
+      confirmed at the point of enquiry. Grove Event Corp deals in official tickets only.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Grove Event Corp (Pty) Ltd · Johannesburg — Sport · Music · Travel</div>
+</footer>
+
+<script>
+(function(){
+  var ENQUIRY_EMAIL = "hello@grovecorp.org";
+  var params = new URLSearchParams(location.search);
+  var eventId = params.get("event");           // e.g. /event/?event=18793
+  var board = document.getElementById("board");
+
+  function money(currency, amount){
+    var sym = {GBP:"£", EUR:"€", USD:"$", ZAR:"R"}[currency] || (currency + " ");
+    return sym + Number(amount).toLocaleString("en-GB");
+  }
+  function fmtDate(iso){
+    if(!iso) return "";
+    try{
+      return new Date(iso).toLocaleDateString("en-GB",
+        {weekday:"long", day:"numeric", month:"long", year:"numeric"});
+    }catch(e){ return ""; }
+  }
+  function enquireLink(name, cat, price, currency){
+    var subject = "Package enquiry: " + name;
+    var body = "Hi Grove Event Corp,\n\nI'd like a package quote for:\n\n"
+      + "Event: " + name + "\n"
+      + (cat ? "Category: " + cat + (price ? " (" + money(currency, price) + ")" : "") + "\n" : "")
+      + "\nMy dates / group size:\n\nThanks";
+    return "mailto:" + ENQUIRY_EMAIL + "?subject=" + encodeURIComponent(subject)
+      + "&body=" + encodeURIComponent(body);
+  }
+
+  if(!eventId){
+    board.className = "error";
+    board.textContent = "No event specified.";
+    return;
+  }
+
+  fetch("/.netlify/functions/tc-prices?products=" + encodeURIComponent(eventId))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.warming){
+        board.className = "loading";
+        board.textContent = "Prices are updating — refreshing automatically…";
+        setTimeout(function(){ location.reload(); }, 12000);
+        return;
+      }
+      var p = data.products && data.products[0];
+      if(!p){ throw new Error(data.error || "Not found"); }
+
+      document.title = p.name + " — Grove Event Corp";
+      document.getElementById("title").innerHTML =
+        p.name.replace(/ v /, ' <em>v</em> ');
+      document.getElementById("meta").textContent = fmtDate(p.date);
+
+      if(p.sold_out){
+        board.className = "";
+        board.innerHTML = '<div class="card"><h2>' + p.name + '</h2>'
+          + '<div style="padding:28px 22px"><span class="soldout">Currently sold out</span>'
+          + '<p class="note" style="margin-top:14px">New allocation can be released before the event. '
+          + '<a href="' + enquireLink(p.name,"","",p.currency) + '">Register your interest →</a></p></div></div>';
+        return;
+      }
+
+      // "from" price
+      var from = document.getElementById("from");
+      document.getElementById("fromAmt").textContent = money(p.currency, p.from);
+      from.hidden = false;
+
+      window.__event = p;
+      var rows = p.options.map(function(o, i){
+        return '<tr>'
+          + '<td>' + o.name + '</td>'
+          + '<td class="qty">up to ' + o.max_qty + '</td>'
+          + '<td class="price">' + money(p.currency, o.price) + '</td>'
+          + '<td style="text-align:right"><button class="enquire" onclick="openBooking(' + i + ')">Reserve</button></td>'
+          + '</tr>';
+      }).join("");
+
+      board.className = "";
+      board.innerHTML =
+        '<div class="card"><h2>' + p.name + ' — package options</h2>'
+        + '<table><thead><tr><th>Category</th><th>Group size</th><th>Price pp</th><th></th></tr></thead>'
+        + '<tbody>' + rows + '</tbody></table></div>';
+      document.getElementById("note").hidden = false;
+    })
+    .catch(function(err){
+      board.className = "error";
+      board.textContent = "Live prices are temporarily unavailable. Please enquire and we'll quote you directly.";
+    });
+})();
+
+// ---- Booking flow ----
+function money2(cur, a){ var s={GBP:"£",EUR:"€",USD:"$",ZAR:"R"}[cur]||(cur+" "); return s+Number(a).toLocaleString("en-GB"); }
+
+function openBooking(i){
+  var p = window.__event, o = p.options[i];
+  var maxQ = Math.min(o.max_qty || 6, 6);
+  var qOpts = "";
+  for (var q=1;q<=maxQ;q++) qOpts += '<option value="'+q+'">'+q+'</option>';
+
+  var m = document.getElementById("bookModal");
+  m.querySelector(".bm-title").textContent = o.name;
+  m.querySelector(".bm-sub").textContent = p.name;
+  m.dataset.optId = o.ticket_option;
+  m.dataset.unit = o.price;
+  m.dataset.cur = p.currency;
+  m.querySelector("#bm-qty").innerHTML = qOpts;
+  m.querySelector(".bm-msg").textContent = "";
+  updateTotal();
+  m.style.display = "flex";
+}
+function closeBooking(){ document.getElementById("bookModal").style.display="none"; }
+function updateTotal(){
+  var m = document.getElementById("bookModal");
+  var q = parseInt(m.querySelector("#bm-qty").value,10)||1;
+  var t = q * parseFloat(m.dataset.unit||0);
+  m.querySelector(".bm-total").textContent = money2(m.dataset.cur, t);
+}
+
+function submitBooking(){
+  var m = document.getElementById("bookModal");
+  var msg = m.querySelector(".bm-msg");
+  var btn = m.querySelector(".bm-submit");
+  var data = {
+    ticket_option: parseInt(m.dataset.optId,10),
+    quantity: parseInt(m.querySelector("#bm-qty").value,10),
+    first_name: m.querySelector("#bm-fn").value,
+    last_name: m.querySelector("#bm-ln").value,
+    email: m.querySelector("#bm-email").value,
+    phone: m.querySelector("#bm-phone").value
+  };
+  if(!m.querySelector("#bm-agree").checked){ msg.textContent="Please tick to confirm this is a committed booking."; return; }
+  msg.style.color="var(--muted)"; msg.textContent="Placing your booking…"; btn.disabled=true;
+
+  fetch("/.netlify/functions/tc-reserve", {
+    method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(data)
+  }).then(function(r){ return r.json(); }).then(function(res){
+    btn.disabled=false;
+    if(res.ok){
+      m.querySelector(".bm-body").innerHTML =
+        '<div style="text-align:center;padding:10px 0">'
+        + '<div style="font-family:var(--display);font-size:22px;color:var(--green);margin-bottom:8px">Booking confirmed ✓</div>'
+        + '<p>Your booking reference is <strong>'+res.order_no+'</strong> for '+money2(res.currency,res.total)+'.</p>'
+        + '<p class="note">We\'ll be in touch shortly with your invoice and payment details. '
+        + 'Questions? Email <a href="mailto:orders@grovecorp.org" style="color:var(--green)">orders@grovecorp.org</a>.</p>'
+        + '<button class="enquire" onclick="closeBooking()" style="margin-top:10px">Done</button></div>';
+    } else {
+      msg.style.color="#9a3b2f"; msg.textContent = res.error || "Something went wrong. Please try again.";
+    }
+  }).catch(function(){
+    btn.disabled=false; msg.style.color="#9a3b2f"; msg.textContent="Network error — please try again.";
+  });
+}
+</script>
+
+<!-- Booking modal -->
+<div id="bookModal" style="display:none;position:fixed;inset:0;background:rgba(12,12,12,.55);z-index:50;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;max-width:460px;width:100%;border-radius:4px;padding:26px;max-height:90vh;overflow:auto">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
+      <div>
+        <div class="bm-title" style="font-family:var(--display);font-size:20px;font-weight:600"></div>
+        <div class="bm-sub" style="color:var(--muted);font-size:14px"></div>
+      </div>
+      <button onclick="closeBooking()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">×</button>
+    </div>
+    <div class="bm-body">
+      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
+        <label style="font-size:13px;color:var(--muted)">Tickets</label>
+        <select id="bm-qty" onchange="updateTotal()" style="padding:8px;border:1px solid var(--line);border-radius:2px;font:inherit"></select>
+        <span style="margin-left:auto;font-family:var(--display);font-size:20px;font-weight:600" class="bm-total"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <input id="bm-fn" placeholder="First name" style="padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit">
+        <input id="bm-ln" placeholder="Last name" style="padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit">
+      </div>
+      <input id="bm-email" type="email" placeholder="Email" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit;margin-top:10px;box-sizing:border-box">
+      <input id="bm-phone" type="tel" placeholder="Contact phone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit;margin-top:10px;box-sizing:border-box">
+      <label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--muted)">
+        <input id="bm-agree" type="checkbox" style="margin-top:3px">
+        <span>I understand this is a <strong>committed booking</strong>. Grove Event Corp will invoice me for payment; official tickets only.</span>
+      </label>
+      <p class="bm-msg" style="font-size:13px;margin:12px 0 0;min-height:16px"></p>
+      <button class="bm-submit enquire" onclick="submitBooking()" style="width:100%;margin-top:8px;padding:12px;border:none;cursor:pointer">Confirm booking</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
