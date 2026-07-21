@@ -1,5 +1,13 @@
-# Tells Netlify where the price-fetching helper files live so they publish
-# on a drag-and-drop deploy. Keep this at the top level of the folder.
+[build]
+  command = "npm install"
+
+[build.environment]
+  NODE_VERSION = "20"
+
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  included_files = ["package.json"]
+
+[functions."tc-poll"]
+  schedule = "* * * * *"
