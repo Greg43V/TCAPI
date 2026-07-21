@@ -1,0 +1,5 @@
+# Tells Netlify where the price-fetching helper files live so they publish
+# on a drag-and-drop deploy. Keep this at the top level of the folder.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

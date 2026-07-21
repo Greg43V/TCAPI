@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grove Event Corp — Sport &amp; Concert Travel Packages</title>
+<meta name="description" content="Grove Event Corp (Pty) Ltd — South African travel packages for the Rugby World Cup, official Premier League tickets, Wimbledon debenture seats and concerts in Europe & America.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B120D;
+  --ink-2:#0F1A12;
+  --bone:#F4F2E9;
+  --bone-dim:rgba(244,242,233,.62);
+  --green:#0E6B3E;
+  --green-deep:#0A3B24;
+  --gold:#D4A72C;
+  --gold-bright:#E7C258;
+  --line:rgba(244,242,233,.14);
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink);
+  color:var(--bone);
+  font-family:'Archivo',sans-serif;
+  font-size:17px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--gold);color:var(--ink)}
+img,svg{display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.mono{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+h1,h2,h3{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+
+/* ---------- NAV ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(11,18,13,.86);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-name{font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.08em;text-transform:uppercase}
+.brand-name span{color:var(--gold)}
+.nav-links{display:flex;gap:34px;align-items:center}
+.nav-links a{font-size:14px;font-weight:600;color:var(--bone-dim);transition:color .2s}
+.nav-links a:hover{color:var(--bone)}
+.nav-cta{
+  background:var(--gold);color:var(--ink)!important;
+  padding:10px 22px;border-radius:999px;font-weight:700;
+  transition:background .2s;
+}
+.nav-cta:hover{background:var(--gold-bright)}
+@media(max-width:720px){.nav-links a:not(.nav-cta){display:none}}
+
+/* ---------- HERO ---------- */
+.hero{
+  position:relative;
+  padding:110px 0 90px;
+  overflow:hidden;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(14,107,62,.34), transparent 65%),
+    radial-gradient(700px 420px at 0% 110%, rgba(212,167,44,.10), transparent 60%),
+    var(--ink);
+}
+.hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(var(--line) 1px, transparent 1px);
+  background-size:100% 96px;
+  opacity:.35;
+  mask-image:linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:10px;
+  color:var(--gold);margin-bottom:28px;
+}
+.hero-eyebrow::before{content:"";width:34px;height:1px;background:var(--gold)}
+.hero h1{
+  font-size:clamp(52px,8.6vw,116px);
+  line-height:.96;
+  max-width:12ch;
+}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p.lede{
+  margin-top:30px;max-width:52ch;font-size:19px;color:var(--bone-dim);
+}
+.hero-actions{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 30px;border-radius:999px;font-weight:700;font-size:15px;
+  transition:transform .15s, background .2s, border-color .2s;
+}
+.btn:active{transform:scale(.98)}
+.btn-gold{background:var(--gold);color:var(--ink)}
+.btn-gold:hover{background:var(--gold-bright)}
+.btn-ghost{border:1px solid var(--line);color:var(--bone)}
+.btn-ghost:hover{border-color:var(--gold)}
+
+/* ---------- DEPARTURE TICKER ---------- */
+.board{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  background:var(--ink-2);
+  overflow:hidden;
+  padding:16px 0;
+}
+.board-track{display:flex;gap:64px;width:max-content;animation:slide 42s linear infinite}
+.board:hover .board-track{animation-play-state:paused}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){
+  .board-track{animation:none;flex-wrap:wrap;width:auto;padding:0 24px;gap:20px 48px}
+  html{scroll-behavior:auto}
+}
+.board-item{display:flex;align-items:center;gap:14px;white-space:nowrap;color:var(--bone-dim)}
+.board-item b{color:var(--bone);font-weight:600}
+.board-item .go{color:var(--gold)}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+
+/* ---------- SECTIONS ---------- */
+section{padding:100px 0}
+.sec-head{margin-bottom:56px;display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.sec-head .mono{color:var(--gold);display:block;margin-bottom:14px}
+.sec-head h2{font-size:clamp(34px,4.6vw,54px);line-height:1.02}
+.sec-head p{max-width:44ch;color:var(--bone-dim)}
+
+/* ---------- TICKET CARDS ---------- */
+.tickets{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:22px}
+.ticket{
+  position:relative;
+  background:var(--ink-2);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:30px 28px 26px;
+  display:flex;flex-direction:column;
+  transition:transform .25s, border-color .25s;
+}
+.ticket:hover{transform:translateY(-6px);border-color:rgba(212,167,44,.5)}
+@media (prefers-reduced-motion:reduce){.ticket:hover{transform:none}}
+.ticket-tag{color:var(--gold);margin-bottom:20px}
+.ticket h3{font-size:26px;line-height:1.1;margin-bottom:12px}
+.ticket p{color:var(--bone-dim);font-size:15px;flex:1}
+/* perforated tear line */
+.tear{
+  margin:24px -28px 18px;
+  border-top:2px dashed rgba(244,242,233,.22);
+  position:relative;
+}
+.tear::before,.tear::after{
+  content:"";position:absolute;top:-9px;width:18px;height:18px;border-radius:50%;
+  background:var(--ink);border:1px solid var(--line);
+}
+.tear::before{left:-10px}
+.tear::after{right:-10px}
+.ticket-foot{display:flex;justify-content:space-between;align-items:center}
+.ticket-foot .mono{color:var(--bone-dim);font-size:11px}
+.ticket-foot a{color:var(--gold);font-weight:700;font-size:14px;transition:color .2s}
+.ticket-foot a:hover{color:var(--gold-bright)}
+.ticket.feature{background:linear-gradient(160deg, var(--green-deep), var(--ink-2) 70%)}
+
+/* ---------- PREMIER LEAGUE SPOTLIGHT ---------- */
+.epl{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(800px 460px at 100% 0%, rgba(212,167,44,.12), transparent 60%),
+    linear-gradient(160deg, var(--green-deep), var(--ink) 75%);
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+}
+.epl::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background-image:repeating-linear-gradient(90deg, transparent 0 110px, rgba(244,242,233,.35) 110px 111px);
+  mask-image:linear-gradient(to right, transparent, black 40%);
+}
+.epl-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:64px;align-items:center;position:relative}
+@media(max-width:900px){.epl-grid{grid-template-columns:1fr}}
+.epl h2{font-size:clamp(40px,5.6vw,68px);line-height:.98}
+.epl h2 em{font-style:normal;color:var(--gold)}
+.epl-copy p{color:var(--bone-dim);margin-top:22px;max-width:46ch}
+.epl-copy .btn{margin-top:34px}
+.grounds{display:grid;gap:0;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:rgba(11,18,13,.55)}
+.ground{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:17px 22px;border-bottom:1px solid var(--line);
+  transition:background .2s;
+}
+.ground:last-child{border-bottom:none}
+.ground:hover{background:rgba(212,167,44,.07)}
+.ground .g-name{font-family:'Anton',sans-serif;font-size:19px;letter-spacing:.04em;text-transform:uppercase}
+.ground .mono{color:var(--bone-dim);font-size:11px}
+.ground .g-go{color:var(--gold);font-weight:700}
+.epl-strip{display:flex;gap:26px;flex-wrap:wrap;margin-top:30px}
+.epl-stat b{display:block;font-family:'Anton',sans-serif;font-size:30px;color:var(--gold);letter-spacing:.02em}
+.epl-stat span{font-size:12px;color:var(--bone-dim);text-transform:uppercase;letter-spacing:.1em}
+
+/* ---------- HOW IT WORKS ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:22px;counter-reset:step}
+.step{
+  border-top:2px solid var(--green);
+  padding-top:24px;
+  counter-increment:step;
+}
+.step::before{
+  content:"Step " counter(step);
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);display:block;margin-bottom:14px;
+}
+.step h3{font-size:22px;margin-bottom:10px}
+.step p{color:var(--bone-dim);font-size:15px}
+
+/* ---------- CONTACT ---------- */
+.contact{background:var(--ink-2);border-top:1px solid var(--line)}
+.contact-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:64px}
+@media(max-width:860px){.contact-grid{grid-template-columns:1fr}}
+.contact-info h2{font-size:clamp(34px,4.6vw,50px);line-height:1.02;margin:14px 0 20px}
+.contact-info p{color:var(--bone-dim);max-width:40ch}
+.contact-lines{margin-top:36px;display:grid;gap:14px}
+.contact-lines .mono{color:var(--bone-dim)}
+.contact-lines .mono b{color:var(--gold);font-weight:600}
+form{display:grid;gap:18px}
+.field{display:grid;gap:8px}
+.field label{font-size:13px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--bone-dim)}
+.field input,.field select,.field textarea{
+  background:var(--ink);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:14px 16px;
+  color:var(--bone);
+  font:inherit;font-size:15px;
+  transition:border-color .2s;
+  width:100%;
+}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4A72C' stroke-width='2' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);outline:none}
+.field textarea{min-height:130px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:560px){.two{grid-template-columns:1fr}}
+.form-note{font-size:13px;color:var(--bone-dim)}
+#formOk{
+  display:none;background:rgba(14,107,62,.25);border:1px solid var(--green);
+  border-radius:10px;padding:14px 16px;font-size:14px;
+}
+
+/* ---------- FOOTER ---------- */
+footer{border-top:1px solid var(--line);padding:38px 0}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.foot .mono{color:var(--bone-dim);font-size:11px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="Grove Event Corp — home">
+      <!-- LOGO -->
+      <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Grove Event Corp logo">
+        <rect width="64" height="64" rx="15" fill="#0A3B24"/>
+        <path d="M44 20 A17 17 0 1 0 49 32" stroke="#F4F2E9" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <line x1="37" y1="32" x2="49" y2="32" stroke="#D4A72C" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <span class="brand-name">Grove <span>Event</span> Corp</span>
+    </a>
+    <nav class="nav-links" aria-label="Main">
+      <a href="#packages">Packages</a>
+      <a href="#premier-league">Premier League</a>
+      <a href="#wimbledon">Wimbledon</a>
+      <a href="#how">How it works</a>
+      <a class="nav-cta" href="#contact">Get in touch</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap">
+      <span class="hero-eyebrow mono">South Africa → The World</span>
+      <h1>The match.<br>The music.<br><em>The mission.</em></h1>
+      <p class="lede">Grove Event Corp builds travel packages around the events worth crossing borders for — the Rugby World Cup, Premier League weekends with official tickets only, Wimbledon on official debenture seats, and the biggest concerts in Europe and America. Tickets, travel and detail — handled.</p>
+      <div class="hero-actions">
+        <a class="btn btn-gold" href="#packages">Explore packages</a>
+        <a class="btn btn-ghost" href="#contact">Plan my trip</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEPARTURE BOARD -->
+  <div class="board mono" aria-label="Featured routes">
+    <div class="board-track">
+      <span class="board-item"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>SYD</b> Rugby World Cup 2027</span>
+      <span class="board-item"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>MAN</b> Premier League Matchday</span>
+      <span class="board-item"><span class="dot"></span><b>CPT</b><span class="go">→</span><b>LHR</b> London Stadium Concerts</span>
+      <span class="board-item"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>SW19</b> Wimbledon Debenture Seats</span>
+      <span class="board-item"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>JFK</b> US Arena Tours</span>
+      <!-- duplicate for seamless loop -->
+      <span class="board-item" aria-hidden="true"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>SYD</b> Rugby World Cup 2027</span>
+      <span class="board-item" aria-hidden="true"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>MAN</b> Premier League Matchday</span>
+      <span class="board-item" aria-hidden="true"><span class="dot"></span><b>CPT</b><span class="go">→</span><b>LHR</b> London Stadium Concerts</span>
+      <span class="board-item" aria-hidden="true"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>SW19</b> Wimbledon Debenture Seats</span>
+      <span class="board-item" aria-hidden="true"><span class="dot"></span><b>JNB</b><span class="go">→</span><b>JFK</b> US Arena Tours</span>
+    </div>
+  </div>
+
+  <!-- PACKAGES -->
+  <section id="packages">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="mono">What we do</span>
+          <h2>Four ways to travel</h2>
+        </div>
+        <p>Every package is built to order — match or show tickets first, then flights, stays and transfers arranged around them.</p>
+      </div>
+      <div class="tickets">
+        <article class="ticket feature">
+          <span class="ticket-tag mono">International · Rugby</span>
+          <h3>Rugby World Cup</h3>
+          <p>Follow the Boks to the game's biggest stage. Pool-match and knockout packages with tickets, flights and city stays — built for the long haul and the loud stands.</p>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-foot"><span class="mono">Admit · RWC</span><a href="#contact">Enquire →</a></div>
+        </article>
+        <article class="ticket">
+          <span class="ticket-tag mono">International · Football</span>
+          <h3>Premier League</h3>
+          <p><strong style="color:var(--gold)">Official tickets only.</strong> Matchday weekends in England — Old Trafford, Anfield, the Emirates and beyond. Tickets, hotels near the ground, and time built in for the city itself.</p>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-foot"><span class="mono">Admit · EPL · Official</span><a href="/premier-league/">View fixtures →</a></div>
+        </article>
+        <article class="ticket">
+          <span class="ticket-tag mono">International · Tennis</span>
+          <h3>Wimbledon</h3>
+          <p><strong style="color:var(--gold)">Official debenture seats.</strong> Centre Court and No.1 Court — the finest views in SW19, with access to exclusive debenture lounges and restaurants. The only tickets that may be officially resold.</p>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-foot"><span class="mono">Admit · SW19 · Debenture</span><a href="#contact">Enquire →</a></div>
+        </article>
+        <article class="ticket">
+          <span class="ticket-tag mono">International · Music</span>
+          <h3>Concerts Abroad</h3>
+          <p>Stadium and arena shows in Europe and America. Tell us the artist and the city — we handle tickets, flights and the nights either side of the show.</p>
+          <div class="tear" aria-hidden="true"></div>
+          <div class="ticket-foot"><span class="mono">Admit · Live</span><a href="#contact">Enquire →</a></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- PREMIER LEAGUE SPOTLIGHT -->
+  <section id="premier-league" class="epl">
+    <div class="wrap epl-grid">
+      <div class="epl-copy">
+        <span class="mono" style="color:var(--gold)">Featured · England</span>
+        <h2 style="margin-top:14px">Premier League <em>weekends,</em> done properly</h2>
+        <p><strong style="color:var(--gold)">Official tickets only</strong> — sourced through authorised channels, never the grey market. Your seat is legitimate, guaranteed and yours.</p>
+        <p>Ninety minutes is the headline — the weekend is the story. We put you in the ground for matchday, in a hotel near the action, and build in time for the city, the pubs and the football culture around it. Solo trips, couples, or a full supporters' crew.</p>
+        <div class="epl-strip">
+          <div class="epl-stat"><b>380</b><span>Fixtures a season</span></div>
+          <div class="epl-stat"><b>Aug–May</b><span>Matchday window</span></div>
+          <div class="epl-stat"><b>±11h</b><span>Direct from JNB</span></div>
+        </div>
+        <a class="btn btn-gold" href="/premier-league/">See all fixtures & prices</a>
+      </div>
+      <div class="grounds" role="list" aria-label="Popular Premier League destinations">
+        <div class="ground" role="listitem"><span class="g-name">Old Trafford</span><span class="mono">Manchester</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Anfield</span><span class="mono">Liverpool</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Emirates Stadium</span><span class="mono">London</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Etihad Stadium</span><span class="mono">Manchester</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Stamford Bridge</span><span class="mono">London</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">St James' Park</span><span class="mono">Newcastle</span><span class="g-go">→</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIMBLEDON -->
+  <section id="wimbledon">
+    <div class="wrap epl-grid">
+      <div class="grounds" role="list" aria-label="What debenture seats include">
+        <div class="ground" role="listitem"><span class="g-name">Centre Court</span><span class="mono">Best sightlines in SW19</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">No.1 Court</span><span class="mono">Premium debenture rows</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Debenture Lounges</span><span class="mono">Exclusive bars &amp; dining</span><span class="g-go">→</span></div>
+        <div class="ground" role="listitem"><span class="g-name">Officially Transferable</span><span class="mono">The only resellable tickets</span><span class="g-go">→</span></div>
+      </div>
+      <div class="epl-copy">
+        <span class="mono" style="color:var(--gold)">Featured · London SW19</span>
+        <h2 style="margin-top:14px">Wimbledon on <em>debenture</em> seats</h2>
+        <p><strong style="color:var(--gold)">Official debenture seats only.</strong> Debentures are the premium seats on Centre Court and No.1 Court — and the only Wimbledon tickets that may be legitimately resold. No ballots, no queue, no grey market.</p>
+        <p>Your package pairs the tennis with the trip: flights from South Africa, hotels in London, and debenture-holder access to exclusive lounges, restaurants and bars inside the grounds.</p>
+        <a class="btn btn-gold" href="#contact">Enquire about Wimbledon</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <span class="mono">The process</span>
+          <h2>Simple by design</h2>
+        </div>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <h3>Tell us the event</h3>
+          <p>The fixture, the tour date, the final — whatever you're chasing. Send an enquiry with your dates and group size.</p>
+        </div>
+        <div class="step">
+          <h3>We build the package</h3>
+          <p>We secure the tickets, then shape flights, accommodation and transfers around them. You get one clear quote.</p>
+        </div>
+        <div class="step">
+          <h3>You go</h3>
+          <p>Everything confirmed before you leave home. All that's left is the anthem, the kickoff, or the opening chord.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact">
+    <div class="wrap contact-grid">
+      <div class="contact-info">
+        <span class="mono" style="color:var(--gold)">Contact us</span>
+        <h2>Where do you want to be?</h2>
+        <p>Tell us about the event and we'll come back to you with a package. No obligation — just options.</p>
+        <div class="contact-lines">
+          <span class="mono"><b>Email</b> — hello@grovecorp.org</span>
+          <span class="mono"><b>Web</b> — grovecorp.org</span>
+          <span class="mono"><b>Based in</b> — Johannesburg, South Africa</span>
+          <span class="mono"><b>Reg</b> — Grove Event Corp (Pty) Ltd</span>
+        </div>
+      </div>
+      <form id="enquiry" novalidate>
+        <div class="two">
+          <div class="field">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="interest">I'm interested in</label>
+          <select id="interest" name="interest">
+            <option>Rugby World Cup</option>
+            <option>Premier League football (official tickets)</option>
+            <option>Wimbledon — debenture seats</option>
+            <option>Concerts — Europe</option>
+            <option>Concerts — America</option>
+            <option>Something else</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="message">Tell us more</label>
+          <textarea id="message" name="message" placeholder="Event, dates, how many of you are travelling…"></textarea>
+        </div>
+        <button class="btn btn-gold" type="submit" style="justify-self:start">Send enquiry</button>
+        <p id="formOk">Thanks — your email app should open with the enquiry ready to send. We'll be in touch.</p>
+        <p class="form-note">Submitting opens your email app. (This form can be wired to a form service like Formspree once the site is live.)</p>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span class="mono">© 2026 Grove Event Corp (Pty) Ltd · Johannesburg</span>
+    <span class="mono">Sport · Music · Travel</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('enquiry').addEventListener('submit', function(e){
+  e.preventDefault();
+  var name = document.getElementById('name').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var interest = document.getElementById('interest').value;
+  var msg = document.getElementById('message').value.trim();
+  if(!name || !email){ 
+    (!name ? document.getElementById('name') : document.getElementById('email')).focus();
+    return; 
+  }
+  var subject = encodeURIComponent('Enquiry: ' + interest + ' — ' + name);
+  var body = encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\nInterest: ' + interest + '\n\n' + msg);
+  window.location.href = 'mailto:hello@grovecorp.org?subject=' + subject + '&body=' + body;
+  document.getElementById('formOk').style.display = 'block';
+});
+</script>
+
+</body>
+</html>
