@@ -15,9 +15,10 @@ export default async (req) => {
   }
 
   const store = getStore("tc-cache");
-  let products = null, prices = null;
+  let products = null, prices = null, venues = null;
   try { products = await store.get("products", { type: "json" }); } catch (_) {}
   try { prices = await store.get("prices", { type: "json" }); } catch (_) {}
+  try { venues = await store.get("venues", { type: "json" }); } catch (_) {}
 
   if (!products || !prices) {
     return new Response(JSON.stringify({ warming: true, products: [] }), { status: 200, headers });
@@ -32,8 +33,10 @@ export default async (req) => {
     const cats = (byId[id] || []).filter((c) => c.available)
       .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option }))
       .sort((a, b) => a.price - b.price);
+    const venue = (venues && venues.byId && m.venue) ? venues.byId[m.venue] : null;
     return {
       id,
+      venue: venue || null,
       name: m.name || `Event ${id}`,
       date: m.date || null,
       currency: m.currency || "GBP",
