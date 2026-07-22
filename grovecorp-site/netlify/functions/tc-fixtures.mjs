@@ -39,7 +39,7 @@ export default async (req) => {
         const avail = cats.filter((c) => c.available).map((c) => c.price);
         if (avail.length) from = Math.min(...avail); else sold_out = true;
       }
-      return { id: p.id, name: p.name, date: p.date, from, priced, sold_out };
+      return { id: p.id, name: p.name, date: p.date, currency: p.currency || "GBP", from, priced, sold_out };
     });
 
   return new Response(JSON.stringify({ competition, count: fixtures.length, fixtures,
