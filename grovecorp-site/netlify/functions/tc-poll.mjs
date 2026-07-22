@@ -130,8 +130,34 @@ async function refreshProducts(store, token) {
     .map((p) => ({ id: p.id, name: p.name, slug: p.slug,
                    competition: p.match.competition,
                    currency: currencyFor(p.match.competition),
+                   venue: p.venue,
                    date: p.match.start.local, utc: p.match.start.utc }));
   await store.setJSON("products", { ts: Date.now(), list: slim });
+
+  // Venue reference data (name, address, coordinates) — static, so cache it once
+  // and only ever fetch venues we don't already hold. Capped per run to protect
+  // the rate limit.
+  try {
+    let venues = null;
+    try { venues = await store.get("venues", { type: "json" }); } catch (_) {}
+    const byId = (venues && venues.byId) || {};
+    const needed = [...new Set(slim.map((p) => p.venue).filter(Boolean))]
+      .filter((id) => !byId[id])
+      .slice(0, 25);
+    if (needed.length) {
+      const fetched = await mapLimit(needed, 4, async (id) => {
+        try {
+          const d = await tcGet(`/venues/${id}`, token);
+          const v = d.data || {};
+          return [id, { name: v.name, address: v.address, city: v.city,
+                        lat: v.coordinates?.lat, lng: v.coordinates?.lng }];
+        } catch (_) { return null; }
+      });
+      for (const row of fetched) if (row) byId[row[0]] = row[1];
+      await store.setJSON("venues", { ts: Date.now(), byId });
+    }
+  } catch (_) {}
+
   return slim;
 }
 
