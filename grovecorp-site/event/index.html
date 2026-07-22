@@ -173,7 +173,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   <p class="small" id="note" hidden style="margin-top:18px">Prices are live from our supplier, per ticket, package inclusive. Availability and price are confirmed when we contact you. Official tickets only.</p>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Bucket List Exp (Pty) Ltd</div></footer>
+<footer><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd</div></footer>
 
 <!-- booking sheet -->
 <div class="sheet-bg" id="sheetBg" onclick="closeBooking()"></div>
@@ -243,17 +243,30 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
      }
    }
 
-   // Stadium map
+   // Seating plan (the stadium sections) — primary
+   if(p.seating_image){
+     var sp=document.createElement('div'); sp.className='card'; sp.style.marginTop='14px';
+     sp.innerHTML='<div class="eyebrow">Where you\'ll sit</div>'
+       +'<h3 style="margin:6px 0 10px">Stadium seating plan</h3>'
+       +'<a href="'+p.seating_image+'" target="_blank" rel="noopener">'
+       +'<img src="'+p.seating_image+'" alt="Stadium seating plan" loading="lazy" '
+       +'style="width:100%;border:1px solid var(--line);border-radius:var(--r);display:block" '
+       +'onerror="this.parentNode.parentNode.style.display=\'none\'"></a>'
+       +'<p class="small" style="margin:10px 0 0">Category colours match the price options above. Tap the plan to enlarge.</p>';
+     document.getElementById("mapwrap").appendChild(sp);
+   }
+
+   // Location map — secondary, smaller
    if(p.venue && p.venue.lat && p.venue.lng){
-     var la=p.venue.lat, ln=p.venue.lng, d=0.008;
-     var bbox=(ln-d)+","+(la-d/2)+","+(ln+d)+","+(la+d/2);
+     var la=p.venue.lat, ln=p.venue.lng, dd=0.008;
+     var bbox=(ln-dd)+","+(la-dd/2)+","+(ln+dd)+","+(la+dd/2);
      var osm="https://www.openstreetmap.org/export/embed.html?bbox="+bbox+"&layer=mapnik&marker="+la+","+ln;
      var gmaps="https://www.google.com/maps/search/?api=1&query="+la+","+ln;
-     document.getElementById("mapwrap").innerHTML=
-       '<div class="card mapcard" style="margin-top:14px;padding:0">'
-       +'<iframe class="map" loading="lazy" src="'+osm+'"></iframe>'
+     var mc=document.createElement('div'); mc.className='card mapcard'; mc.style.marginTop='14px'; mc.style.padding='0';
+     mc.innerHTML='<iframe class="map" loading="lazy" src="'+osm+'"></iframe>'
        +'<div style="padding:14px 16px"><h3 style="margin:0">'+(p.venue.name||"Stadium")+'</h3>'
-       +'<div class="venue-addr">'+(p.venue.address||"")+' &middot; <a href="'+gmaps+'" target="_blank" rel="noopener" style="color:var(--blue)">Open in Maps &rarr;</a></div></div></div>';
+       +'<div class="venue-addr">'+(p.venue.address||"")+' &middot; <a href="'+gmaps+'" target="_blank" rel="noopener" style="color:var(--blue)">Open in Maps &rarr;</a></div></div>';
+     document.getElementById("mapwrap").appendChild(mc);
    }
  })
  .catch(function(){ board.innerHTML='<div class="state">Live prices are temporarily unavailable. Please <a href="/#contact" style="color:var(--accent)">enquire</a> and we\'ll quote you directly.</div>'; });
