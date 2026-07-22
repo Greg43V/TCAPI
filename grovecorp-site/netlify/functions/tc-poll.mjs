@@ -70,9 +70,40 @@ async function tcPost(path, token, body) {
   if (!res.ok) throw new Error(`POST ${path} -> ${res.status}`);
   return res.json();
 }
-function applyMargin(cost) {
+// Per-club margin overrides, e.g. TC_MARGIN_OVERRIDES="Arsenal=3,Liverpool=3"
+// Any fixture whose name contains the key uses that margin instead of the default.
+const MARGIN_OVERRIDES = (process.env.TC_MARGIN_OVERRIDES || "")
+  .split(",")
+  .map((pair) => pair.split("="))
+  .filter((kv) => kv.length === 2 && kv[0].trim())
+  .map(([k, v]) => [k.trim().toLowerCase(), parseFloat(v)])
+  .filter(([, v]) => !isNaN(v));
+
+function marginFor(productName) {
+  const n = (productName || "").toLowerCase();
+  for (const [key, pct] of MARGIN_OVERRIDES) {
+    if (n.includes(key)) return pct;
+  }
+  return MARGIN_PCT;
+}
+
+function applyMargin(cost, productName) {
+  const pct = marginFor(productName);
   const step = ROUND_TO > 0 ? ROUND_TO : 1;
-  return Math.ceil((cost * (1 + MARGIN_PCT / 100)) / step) * step;
+  return Math.ceil((cost * (1 + pct / 100)) / step) * step;
+}
+
+// The product list endpoint doesn't return currency, and fetching per-product
+// detail would blow the rate limit — so map competition -> currency.
+const COMPETITION_CURRENCY = {
+  401: "GBP", // English Premier League
+  405: "EUR", // La Liga
+  407: "EUR", // Ligue 1
+  410: "EUR", // Serie A
+  409: "EUR", // Champions League
+};
+function currencyFor(competition) {
+  return COMPETITION_CURRENCY[competition] || "GBP";
 }
 async function mapLimit(items, limit, worker) {
   const out = new Array(items.length);
@@ -98,6 +129,7 @@ async function refreshProducts(store, token) {
     .filter((p) => p.match && p.match.start && p.match.start.utc)
     .map((p) => ({ id: p.id, name: p.name, slug: p.slug,
                    competition: p.match.competition,
+                   currency: currencyFor(p.match.competition),
                    date: p.match.start.local, utc: p.match.start.utc }));
   await store.setJSON("products", { ts: Date.now(), list: slim });
   return slim;
@@ -107,6 +139,8 @@ async function refreshProducts(store, token) {
 async function refreshPrices(store, products) {
   const token = await tokenFetch(store);
   const ids = products.map((p) => p.id);
+  const nameById = {};
+  for (const p of products) nameById[p.id] = p.name;
   const priced = {}; // id -> [{name, price, max_qty, available}]
   for (let i = 0; i < ids.length; i += 100) {
     const batch = ids.slice(i, i + 100);
@@ -117,7 +151,7 @@ async function refreshPrices(store, products) {
         priced[p.id] = (p.ticket_options || []).map((o) => ({
           name: o.name,
           cost: o.price,
-          price: applyMargin(o.price),
+          price: applyMargin(o.price, nameById[p.id]),
           max_qty: o.max_purchase_qty,
           available: o.available,
           ticket_option: o.id,
