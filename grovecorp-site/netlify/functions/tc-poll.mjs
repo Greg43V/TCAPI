@@ -181,6 +181,7 @@ async function refreshPrices(store, products) {
           max_qty: o.max_purchase_qty,
           available: o.available,
           ticket_option: o.id,
+          ticket_category: o.ticket_category,
         }));
       }
       if (page >= (d.meta?.last_page || 1) || (d.data || []).length === 0) break;
