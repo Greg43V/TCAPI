@@ -247,8 +247,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
           <option>Something else</option>
         </select></div>
       <div class="field"><label class="fl" for="cmsg">Tell us more</label><textarea id="cmsg" placeholder="Dates, group size, anything else"></textarea></div>
-      <button class="btn btn-primary btn-block" onclick="sendEnquiry()">Send enquiry</button>
-      <p class="small" style="margin-top:10px" id="formNote">Submitting opens your email app with the enquiry ready to send.</p>
+      <button class="btn btn-primary btn-block" id="cbtn" onclick="sendEnquiry()">Send enquiry</button>
+      <p class="small" style="margin-top:10px" id="formNote">Your enquiry is sent straight to our team — no email app needed.</p>
     </div>
   </section>
 </main>
@@ -262,10 +262,17 @@ function sendEnquiry(){
   var i=document.getElementById("cint").value;
   var m=document.getElementById("cmsg").value.trim();
   var note=document.getElementById("formNote");
-  if(!n||!e){ note.textContent="Please add your name and email."; return; }
-  var body="Name: "+n+"\nEmail: "+e+"\nInterested in: "+i+"\n\n"+m;
-  window.location.href="mailto:hello@grovecorp.org?subject="+encodeURIComponent("Enquiry: "+i)+"&body="+encodeURIComponent(body);
-  note.textContent="Thanks — your email app should open with the enquiry ready to send.";
+  var btn=document.getElementById("cbtn");
+  if(!n||!e){ note.style.color="var(--danger)"; note.textContent="Please add your name and email."; return; }
+  note.style.color="var(--muted)"; note.textContent="Sending\u2026"; if(btn) btn.disabled=true;
+  fetch("/.netlify/functions/enquiry",{method:"POST",headers:{"content-type":"application/json"},
+    body:JSON.stringify({name:n,email:e,interest:i,message:m})})
+   .then(function(r){return r.json();}).then(function(res){ if(btn) btn.disabled=false;
+     if(res.ok){ document.getElementById("cname").value="";document.getElementById("cemail").value="";document.getElementById("cmsg").value="";
+       note.style.color="var(--accent)"; note.textContent="Thanks \u2014 your enquiry has been sent. We'll be in touch shortly."; }
+     else { note.style.color="var(--danger)"; note.textContent=res.error||"Something went wrong \u2014 please email hello@grovecorp.org."; }
+   }).catch(function(){ if(btn) btn.disabled=false; note.style.color="var(--danger)";
+     note.textContent="Couldn't send just now \u2014 please email hello@grovecorp.org."; });
 }
 </script>
 </body>
