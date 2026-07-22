@@ -119,6 +119,14 @@ footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-s
 ::selection{background:var(--blue-soft)}
 a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* hero box */
+.herobox{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px 22px;position:relative;overflow:hidden}
+.herobox::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--accent)}
+@media(min-width:820px){ .herobox{padding:38px 34px} }
+.herobox h1{margin:10px 0 12px}
+.herobox .btns{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+@media(min-width:560px){ .herobox .btns{flex-direction:row} }
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:var(--r);margin:0 6px 6px 0}
 
 .hero{padding:34px 0 8px}
 .hero .btns{display:flex;flex-direction:column;gap:10px;margin-top:20px}
@@ -145,11 +153,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 
 <main>
   <!-- HERO -->
-  <section class="wrap hero">
-    <div class="narrow">
+  <section class="wrap" style="padding:26px 0 8px">
+    <div class="herobox">
       <div class="eyebrow">South Africa &rarr; The World</div>
-      <h1>The match. The music. The mission.</h1>
-      <p class="lede">Travel packages built around the events worth crossing borders for — official tickets first, then flights, hotels and transfers arranged around them.</p>
+      <h1>The match.<br>The music.<br><span style="color:var(--accent)">The mission.</span></h1>
+      <p class="lede" style="max-width:52ch">Travel packages built around the events worth crossing borders for — official tickets first, then flights, hotels and transfers arranged around them.</p>
+      <div>
+        <span class="pill" style="background:var(--blue-soft);color:var(--blue-dk)">Premier League</span>
+        <span class="pill" style="background:var(--accent-soft);color:var(--accent-dk)">Rugby World Cup</span>
+        <span class="pill" style="background:#F2ECDD;color:#8A6516">Wimbledon</span>
+        <span class="pill" style="background:#EFEBE3;color:var(--muted)">Concerts</span>
+      </div>
       <div class="btns">
         <a class="btn btn-primary" href="/premier-league/">See Premier League fixtures</a>
         <a class="btn btn-blue" href="#contact">Plan my trip</a>
