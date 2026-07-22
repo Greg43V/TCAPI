@@ -198,6 +198,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 
 <script>
 var EV=null;
+var PL_STANDARD='<div><h3>What\'s included</h3><div class="descbody">'
+  +'<ul>'
+  +'<li><strong>Official match ticket</strong> in your chosen category — sourced through authorised channels, never the grey market.</li>'
+  +'<li><strong>Seat located</strong> in the stadium section shown on the seating plan below.</li>'
+  +'<li><strong>Booking handled end to end</strong> by our team — we confirm availability and price with you before anything is paid.</li>'
+  +'<li><strong>Travel add-ons on request</strong> — flights from South Africa, hotels near the ground and transfers can be arranged around your match.</li>'
+  +'</ul>'
+  +'<p style="margin:6px 0 0">Tickets are for the fixture shown. Category names reflect the seating area; final availability is confirmed at booking.</p>'
+  +'</div></div>';
 var params=new URLSearchParams(location.search), eventId=params.get("event");
 var board=document.getElementById("board");
 function money(cur,a){ var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur]||(cur+" "); return s+Number(a).toLocaleString("en-GB"); }
@@ -223,7 +232,7 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
          +'<div class="oqty">Up to '+o.max_qty+' tickets</div></div>'
          +'<div style="display:flex;align-items:center;gap:14px">'
          +'<div class="oprice">'+money(p.currency,o.price)+'</div>'
-         +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onclick="openBooking('+i+')">Request</button>'
+         +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onmouseenter="highlightCategory('+i+')" onclick="highlightCategory('+i+');openBooking('+i+')">Request</button>'
          +'</div></div>';
      }).join("");
      board.innerHTML='<div class="card"><div class="eyebrow">Seating &amp; packages</div>'
@@ -231,29 +240,37 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
      document.getElementById("note").hidden=false;
    }
 
-   // Package description (from API — shows only when populated)
-   if(p.description){
-     var parts=[];
-     if(p.description.information) parts.push('<div><h3>About this package</h3><div class="descbody">'+p.description.information+'</div></div>');
-     if(p.description.timetable)   parts.push('<div style="margin-top:14px"><h3>Timetable</h3><div class="descbody">'+p.description.timetable+'</div></div>');
-     if(p.description.notes)       parts.push('<div style="margin-top:14px"><h3>Good to know</h3><div class="descbody">'+p.description.notes+'</div></div>');
-     if(parts.length){
-       var dc=document.createElement('div'); dc.className='card'; dc.style.marginTop='14px';
-       dc.innerHTML=parts.join(''); document.getElementById('mapwrap').appendChild(dc);
-     }
-   }
+   // Package description: API text if present, otherwise our standard inclusions.
+   var parts=[];
+   var dsc=p.description||{};
+   if(dsc.information) parts.push('<div><h3>About this package</h3><div class="descbody">'+dsc.information+'</div></div>');
+   if(dsc.timetable)   parts.push('<div style="margin-top:14px"><h3>Timetable</h3><div class="descbody">'+dsc.timetable+'</div></div>');
+   if(dsc.notes)       parts.push('<div style="margin-top:14px"><h3>Good to know</h3><div class="descbody">'+dsc.notes+'</div></div>');
+   if(!parts.length) parts.push(PL_STANDARD);
+   var dc=document.createElement('div'); dc.className='card'; dc.style.marginTop='14px';
+   dc.innerHTML=parts.join(''); document.getElementById('mapwrap').appendChild(dc);
 
-   // Seating plan (the stadium sections) — primary
+   // Seating plan — primary. If it's an SVG we inline it so sections can highlight.
    if(p.seating_image){
      var sp=document.createElement('div'); sp.className='card'; sp.style.marginTop='14px';
      sp.innerHTML='<div class="eyebrow">Where you\'ll sit</div>'
-       +'<h3 style="margin:6px 0 10px">Stadium seating plan</h3>'
-       +'<a href="'+p.seating_image+'" target="_blank" rel="noopener">'
-       +'<img src="'+p.seating_image+'" alt="Stadium seating plan" loading="lazy" '
-       +'style="width:100%;border:1px solid var(--line);border-radius:var(--r);display:block" '
-       +'onerror="this.parentNode.parentNode.style.display=\'none\'"></a>'
-       +'<p class="small" style="margin:10px 0 0">Category colours match the price options above. Tap the plan to enlarge.</p>';
+       +'<h3 style="margin:6px 0 8px">Stadium seating plan</h3>'
+       +'<div id="planhost" style="border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff"></div>'
+       +'<p class="small" id="planhint" style="margin:10px 0 0">Tap a package above to highlight its seating area.</p>';
      document.getElementById("mapwrap").appendChild(sp);
+     var host=document.getElementById("planhost");
+     var isSvg=/\.svg(\?|$)/i.test(p.seating_image);
+     if(isSvg){
+       fetch(p.seating_image).then(function(r){return r.ok?r.text():Promise.reject();}).then(function(svg){
+         host.innerHTML=svg;
+         var el=host.querySelector("svg"); if(el){ el.style.width="100%"; el.style.height="auto"; el.style.display="block"; }
+         window.__plan=host;
+       }).catch(function(){ // fallback to flat image
+         host.innerHTML='<a href="'+p.seating_image+'" target="_blank" rel="noopener"><img src="'+p.seating_image+'" style="width:100%;display:block" alt="Seating plan"></a>';
+       });
+     } else {
+       host.innerHTML='<a href="'+p.seating_image+'" target="_blank" rel="noopener"><img src="'+p.seating_image+'" style="width:100%;display:block" alt="Seating plan" onerror="this.closest(\'.card\').style.display=\'none\'"></a>';
+     }
    }
 
    // Location map — secondary, smaller
@@ -271,6 +288,22 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
  })
  .catch(function(){ board.innerHTML='<div class="state">Live prices are temporarily unavailable. Please <a href="/#contact" style="color:var(--accent)">enquire</a> and we\'ll quote you directly.</div>'; });
 
+function highlightCategory(i){
+  var host=window.__plan; if(!host||!EV||!EV.category_map) return;
+  var opt=EV.options[i]; if(!opt) return;
+  // clear
+  host.querySelectorAll("[data-hl]").forEach(function(p){ p.removeAttribute("data-hl"); p.style.fill=p.__origFill||""; p.style.opacity=""; });
+  // find category entry by ticket_category id if available, else by index
+  var entry=null;
+  if(opt.ticket_category!=null) entry=EV.category_map.filter(function(c){return c.ticket_category_id===opt.ticket_category;})[0];
+  if(!entry) entry=EV.category_map[i];
+  if(!entry||!entry.path_ids) return;
+  entry.path_ids.forEach(function(pid){
+    var el=host.querySelector("#"+CSS.escape(String(pid)))||host.querySelector('[id="'+pid+'"]');
+    if(el){ if(el.__origFill==null) el.__origFill=el.style.fill||el.getAttribute("fill")||""; el.setAttribute("data-hl","1"); el.style.fill="#1E5BD6"; el.style.opacity="0.85"; }
+  });
+  var hint=document.getElementById("planhint"); if(hint) hint.textContent=opt.name+" — highlighted on the plan.";
+}
 function openBooking(i){
   var o=EV.options[i], maxQ=Math.min(o.max_qty||6,6), q="";
   for(var k=1;k<=maxQ;k++) q+='<option value="'+k+'">'+k+'</option>';
