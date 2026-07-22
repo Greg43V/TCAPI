@@ -2,308 +2,264 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Event — Grove Event Corp</title>
-<meta name="description" content="Live package pricing and official tickets for major sporting events — Grove Event Corp (Pty) Ltd." />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F5F0" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Event — Grove Event Corp</title>
+<meta name="description" content="Live prices and official tickets for Premier League matches. Grove Event Corp." />
 <style>
-  /* ---- Brand tokens (matched to grovecorp.org — adjust to your exact CSS once the
-         repo/host is available so this is pixel-identical) ---- */
-  :root{
-    --ink:#F2EFE6;
-    --paper:#0B0B0C;
-    --bone:#141416;
-    --raise:#1A1A1D;
-    --green:#C9A063;
-    --gold:#8C6A3A;
-    --line:rgba(242,239,230,.12);
-    --muted:rgba(242,239,230,.55);
-    --display:'Anton',sans-serif;
-    --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    --mono:'IBM Plex Mono',monospace;
+:root{
+  --paper:#F7F5F0; --card:#FFFFFF; --ink:#131B19; --ink-2:#3F4C49;
+  --muted:#6E7B77; --line:#E5E0D6; --line-2:#EFEBE3;
+  --accent:#0F6E62; --accent-dk:#0A544A; --accent-soft:#E9F1EF;
+  --danger:#B4472B; --r:10px;
+  --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
 }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
-  a{color:inherit}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img,iframe{max-width:100%}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px}
+.narrow{max-width:680px}
 
-  /* header */
-  header{border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brand{font-family:var(--display);font-weight:600;letter-spacing:.2px;font-size:19px}
-  .back{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
-  .back:hover{color:var(--ink)}
+/* header */
+header{position:sticky;top:0;z-index:30;background:rgba(247,245,240,.92);
+  backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
+.brand{font-weight:700;letter-spacing:-.02em;font-size:17px}
+.brand span{color:var(--accent)}
+.navlink{font-size:14px;color:var(--muted);padding:10px 2px}
+.navlink:hover{color:var(--ink)}
 
-  /* eyebrow tag — echoes the site's "Admit · EPL · Official" style */
-  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600}
-  .eyebrow .dot{color:var(--gold);margin:0 6px}
+/* buttons — 48px tap targets */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:0 20px;border-radius:var(--r);font-size:15px;font-weight:600;
+  border:1px solid transparent;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dk)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--ink-2)}
+.btn-block{width:100%}
 
-  /* hero */
-  .hero{padding:56px 0 32px}
-  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,5vw,52px);line-height:1.05;margin:14px 0 10px}
-  .hero h1 em{font-style:normal;color:var(--green)}
-  .meta{color:var(--muted);font-size:15px}
-  .from{margin-top:22px;display:inline-flex;align-items:baseline;gap:10px}
-  .from .label{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-  .from .amt{font-family:var(--mono);font-size:34px;font-weight:600}
+/* type */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:500}
+h1{font-size:clamp(30px,7vw,46px);line-height:1.1;letter-spacing:-.025em;font-weight:700;margin:12px 0 14px}
+h2{font-size:clamp(23px,4.6vw,31px);line-height:1.18;letter-spacing:-.02em;font-weight:700;margin:10px 0 12px}
+h3{font-size:18px;line-height:1.3;letter-spacing:-.01em;font-weight:600;margin:0 0 6px}
+p{margin:0 0 14px;color:var(--ink-2)}
+.lede{font-size:18px;color:var(--ink-2)}
+.small{font-size:14px;color:var(--muted)}
+.section{padding:44px 0}
+.section + .section{border-top:1px solid var(--line)}
+@media(min-width:820px){ .section{padding:72px 0} }
 
-  /* price table */
-  section.prices{padding:8px 0 48px}
-  .card{border:1px solid var(--line);border-radius:2px;overflow:hidden}
-  .card h2{margin:0;padding:18px 22px;font-family:var(--sans);letter-spacing:.02em;font-size:18px;font-weight:600;border-bottom:1px solid var(--line);background:var(--bone)}
-  table{width:100%;border-collapse:collapse}
-  th,td{text-align:left;padding:15px 22px;font-size:15px;border-bottom:1px solid var(--line)}
-  th{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
-  td.price{font-family:var(--mono);font-weight:600;white-space:nowrap}
-  td.qty{color:var(--muted);white-space:nowrap}
-  tr:last-child td{border-bottom:none}
-  .cta-row td{padding:0}
-  .enquire{display:inline-block;margin:0;padding:9px 16px;background:var(--green);color:#0B0B0C;text-decoration:none;font-size:13px;letter-spacing:.04em;border-radius:2px}
-  .enquire:hover{background:var(--gold);color:var(--ink)}
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.grid{display:grid;gap:14px}
+@media(min-width:760px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
 
-  /* states */
-  .note{color:var(--muted);font-size:13px;margin-top:16px}
-  .soldout{display:inline-block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#E0785F;border:1px solid rgba(224,120,95,.35);border-radius:2px;padding:3px 8px}
-  .loading,.error{padding:40px 22px;color:var(--muted);text-align:center;border:1px dashed var(--line);border-radius:2px}
-  .error{color:#E0785F;border-color:rgba(224,120,95,.35)}
+/* stats */
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 22px;padding:0;list-style:none}
+.stats li{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:10px 14px;font-size:14px;color:var(--muted)}
+.stats b{display:block;font-family:var(--mono);font-size:17px;color:var(--ink);font-weight:500}
 
-  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:13px}
+/* list rows (fixtures) */
+.rows{margin-top:6px}
+.row{display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;margin-bottom:10px;transition:border-color .15s,transform .08s}
+.row:hover{border-color:var(--accent)}
+.row:active{transform:scale(.995)}
+.row-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.row-date{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.row-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:4px 0 0}
+.row-venue{font-size:13px;color:var(--muted);margin-top:2px}
+.row-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.price{font-family:var(--mono);font-size:17px;font-weight:500}
+.price .lbl{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:var(--sans);font-weight:600}
+.go{font-size:14px;font-weight:600;color:var(--accent)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-dk)}
+.chip-out{background:#FBEEEA;color:var(--danger)}
+.groupline{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:26px 0 10px}
 
-  #bookModal > div{background:var(--bone)!important;border:1px solid var(--line)}
-  #bookModal input,#bookModal select{background:var(--raise);color:var(--ink);border:1px solid var(--line)}
-  #bookModal .bm-total{font-family:var(--mono);color:var(--green)}
-  .bm-submit{background:var(--green);color:#0B0B0C;font-weight:600}
-  .soldout{border-color:rgba(201,160,99,.35);color:var(--green)}
+/* forms */
+input,select,textarea{width:100%;min-height:48px;padding:12px 14px;font:inherit;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+textarea{min-height:110px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+label.fl{display:block;font-size:13px;font-weight:600;margin:0 0 6px}
+.field{margin-bottom:14px}
 
-  /* --- dark luxe refinements --- */
-  .brand,.hero h1{font-family:var(--display);letter-spacing:.01em;text-transform:uppercase}
-  .hero h1{font-weight:400;line-height:1.02}
-  .hero h1 em{font-style:normal;color:var(--green)}
-  input,select,textarea{background:var(--raise);color:var(--ink);border:1px solid var(--line)}
-  input::placeholder{color:var(--muted)}
-  input:focus,select:focus{outline:2px solid var(--green);outline-offset:1px}
-  ::selection{background:var(--green);color:#0B0B0C}
-  a:focus-visible,button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* states */
+.state{padding:34px 4px;text-align:center;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
+::selection{background:var(--accent-soft)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.opt{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 0;border-bottom:1px solid var(--line-2)}
+.opt:last-child{border-bottom:none}
+.opt .oname{font-weight:600;font-size:16px}
+.opt .oqty{font-size:12px;color:var(--muted)}
+.opt .oprice{font-family:var(--mono);font-size:16px;text-align:right}
+.map{border:0;width:100%;height:220px;border-radius:var(--r);filter:grayscale(.2)}
+.mapcard{overflow:hidden}
+.venue-addr{font-size:14px;color:var(--muted);margin-top:10px}
+.venue-addr a{color:var(--accent);font-weight:600}
+/* booking sheet — bottom sheet on mobile */
+.sheet-bg{display:none;position:fixed;inset:0;background:rgba(10,12,11,.5);z-index:50}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:51;background:var(--card);
+  border-radius:16px 16px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));
+  max-height:92vh;overflow:auto;display:none}
+@media(min-width:620px){ .sheet{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);
+  max-width:440px;width:100%;border-radius:var(--r)} }
+.sheet.open,.sheet-bg.open{display:block}
+.sheet h3{font-size:19px}
+.sheet .close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:26px;color:var(--muted);cursor:pointer;min-height:auto;padding:0;width:auto}
+.total{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:15px}
+.total b{font-family:var(--mono);font-size:20px}
+.agree{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:14px 0}
+.agree input{width:auto;min-height:auto;margin-top:3px}
+.bm-msg{font-size:13px;min-height:16px;margin:8px 0 0}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap bar">
-    <span class="brand">Grove Event Corp</span>
-    <a class="back" href="/#packages">← All packages</a>
+    <a class="brand" href="/">Grove <span>Event Corp</span></a>
+    <a class="navlink" href="/premier-league/">&larr; Fixtures</a>
   </div>
 </header>
 
-<main class="wrap" id="app">
-  <div class="hero">
-    <div class="eyebrow" id="eyebrow">International <span class="dot">·</span> Football <span class="dot">·</span> Official</div>
-    <h1 id="title">Loading event…</h1>
-    <div class="meta" id="meta"></div>
-    <div class="from" id="from" hidden>
-      <span class="label">Packages from</span>
-      <span class="amt" id="fromAmt"></span>
-    </div>
-  </div>
-
-  <section class="prices">
-    <div id="board" class="loading">Fetching live prices…</div>
-    <p class="note" id="note" hidden>
-      Prices are live from our supplier and shown per ticket, package inclusive. Availability and price
-      confirmed at the point of enquiry. Grove Event Corp deals in official tickets only.
-    </p>
+<main class="wrap narrow" id="app">
+  <section style="padding:24px 0 4px">
+    <div class="eyebrow" id="eyebrow">Football &middot; Official tickets</div>
+    <h1 id="title">Loading…</h1>
+    <p class="lede" id="meta"></p>
   </section>
+
+  <div id="board"><div class="state">Fetching live prices…</div></div>
+
+  <div id="mapwrap"></div>
+
+  <p class="small" id="note" hidden style="margin-top:18px">Prices are live from our supplier, per ticket, package inclusive. Availability and price are confirmed when we contact you. Official tickets only.</p>
 </main>
 
-<footer>
-  <div class="wrap">© 2026 Grove Event Corp (Pty) Ltd · Johannesburg — Sport · Music · Travel</div>
-</footer>
+<footer><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd</div></footer>
 
-<script>
-(function(){
-  var ENQUIRY_EMAIL = "hello@grovecorp.org";
-  var params = new URLSearchParams(location.search);
-  var eventId = params.get("event");           // e.g. /event/?event=18793
-  var board = document.getElementById("board");
-
-  function money(currency, amount){
-    var sym = {GBP:"£", EUR:"€", USD:"$", ZAR:"R"}[currency] || (currency + " ");
-    return sym + Number(amount).toLocaleString("en-GB");
-  }
-  function fmtDate(iso){
-    if(!iso) return "";
-    try{
-      return new Date(iso).toLocaleDateString("en-GB",
-        {weekday:"long", day:"numeric", month:"long", year:"numeric"});
-    }catch(e){ return ""; }
-  }
-  function enquireLink(name, cat, price, currency){
-    var subject = "Package enquiry: " + name;
-    var body = "Hi Grove Event Corp,\n\nI'd like a package quote for:\n\n"
-      + "Event: " + name + "\n"
-      + (cat ? "Category: " + cat + (price ? " (" + money(currency, price) + ")" : "") + "\n" : "")
-      + "\nMy dates / group size:\n\nThanks";
-    return "mailto:" + ENQUIRY_EMAIL + "?subject=" + encodeURIComponent(subject)
-      + "&body=" + encodeURIComponent(body);
-  }
-
-  if(!eventId){
-    board.className = "error";
-    board.textContent = "No event specified.";
-    return;
-  }
-
-  fetch("/.netlify/functions/tc-prices?products=" + encodeURIComponent(eventId))
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if(data && data.warming){
-        board.className = "loading";
-        board.textContent = "Prices are updating — refreshing automatically…";
-        setTimeout(function(){ location.reload(); }, 12000);
-        return;
-      }
-      var p = data.products && data.products[0];
-      if(!p){ throw new Error(data.error || "Not found"); }
-
-      document.title = p.name + " — Grove Event Corp";
-      document.getElementById("title").innerHTML =
-        p.name.replace(/ v /, ' <em>v</em> ');
-      document.getElementById("meta").textContent = fmtDate(p.date);
-
-      if(p.sold_out){
-        board.className = "";
-        board.innerHTML = '<div class="card"><h2>' + p.name + '</h2>'
-          + '<div style="padding:28px 22px"><span class="soldout">Currently sold out</span>'
-          + '<p class="note" style="margin-top:14px">New allocation can be released before the event. '
-          + '<a href="' + enquireLink(p.name,"","",p.currency) + '">Register your interest →</a></p></div></div>';
-        return;
-      }
-
-      // "from" price
-      var from = document.getElementById("from");
-      document.getElementById("fromAmt").textContent = money(p.currency, p.from);
-      from.hidden = false;
-
-      window.__event = p;
-      var rows = p.options.map(function(o, i){
-        return '<tr>'
-          + '<td>' + o.name + '</td>'
-          + '<td class="qty">up to ' + o.max_qty + '</td>'
-          + '<td class="price">' + money(p.currency, o.price) + '</td>'
-          + '<td style="text-align:right"><button class="enquire" onclick="openBooking(' + i + ')">Reserve</button></td>'
-          + '</tr>';
-      }).join("");
-
-      board.className = "";
-      board.innerHTML =
-        '<div class="card"><h2>' + p.name + ' — package options</h2>'
-        + '<table><thead><tr><th>Category</th><th>Group size</th><th>Price pp</th><th></th></tr></thead>'
-        + '<tbody>' + rows + '</tbody></table></div>';
-      document.getElementById("note").hidden = false;
-    })
-    .catch(function(err){
-      board.className = "error";
-      board.textContent = "Live prices are temporarily unavailable. Please enquire and we'll quote you directly.";
-    });
-})();
-
-// ---- Booking flow ----
-function money2(cur, a){ var s={GBP:"£",EUR:"€",USD:"$",ZAR:"R"}[cur]||(cur+" "); return s+Number(a).toLocaleString("en-GB"); }
-
-function openBooking(i){
-  var p = window.__event, o = p.options[i];
-  var maxQ = Math.min(o.max_qty || 6, 6);
-  var qOpts = "";
-  for (var q=1;q<=maxQ;q++) qOpts += '<option value="'+q+'">'+q+'</option>';
-
-  var m = document.getElementById("bookModal");
-  m.querySelector(".bm-title").textContent = o.name;
-  m.querySelector(".bm-sub").textContent = p.name;
-  m.dataset.optId = o.ticket_option;
-  m.dataset.unit = o.price;
-  m.dataset.cur = p.currency;
-  m.querySelector("#bm-qty").innerHTML = qOpts;
-  m.querySelector(".bm-msg").textContent = "";
-  updateTotal();
-  m.style.display = "flex";
-}
-function closeBooking(){ document.getElementById("bookModal").style.display="none"; }
-function updateTotal(){
-  var m = document.getElementById("bookModal");
-  var q = parseInt(m.querySelector("#bm-qty").value,10)||1;
-  var t = q * parseFloat(m.dataset.unit||0);
-  m.querySelector(".bm-total").textContent = money2(m.dataset.cur, t);
-}
-
-function submitBooking(){
-  var m = document.getElementById("bookModal");
-  var msg = m.querySelector(".bm-msg");
-  var btn = m.querySelector(".bm-submit");
-  var data = {
-    ticket_option: parseInt(m.dataset.optId,10),
-    quantity: parseInt(m.querySelector("#bm-qty").value,10),
-    first_name: m.querySelector("#bm-fn").value,
-    last_name: m.querySelector("#bm-ln").value,
-    email: m.querySelector("#bm-email").value,
-    phone: m.querySelector("#bm-phone").value
-  };
-  if(!m.querySelector("#bm-agree").checked){ msg.textContent="Please tick the box to continue."; return; }
-  msg.style.color="var(--muted)"; msg.textContent="Holding your seats…"; btn.disabled=true;
-
-  fetch("/.netlify/functions/tc-reserve", {
-    method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(data)
-  }).then(function(r){ return r.json(); }).then(function(res){
-    btn.disabled=false;
-    if(res.ok){
-      m.querySelector(".bm-body").innerHTML =
-        '<div style="text-align:center;padding:10px 0">'
-        + '<div style="font-family:var(--display);font-size:22px;color:var(--green);margin-bottom:8px">Seats requested ✓</div>'
-        + '<p>Reference <strong>'+res.reservation_num+'</strong> — '+money2(res.currency,res.total)+'.</p>'
-        + '<p class="note">We\'ve placed a short hold and will contact you very shortly to confirm availability and take payment. '
-        + 'Nothing has been charged and no booking is confirmed until we speak. '
-        + 'Questions? Email <a href="mailto:orders@grovecorp.org" style="color:var(--green)">orders@grovecorp.org</a>.</p>'
-        + '<button class="enquire" onclick="closeBooking()" style="margin-top:10px">Done</button></div>';
-    } else {
-      msg.style.color="#E0785F"; msg.textContent = res.error || "Something went wrong. Please try again.";
-    }
-  }).catch(function(){
-    btn.disabled=false; msg.style.color="#E0785F"; msg.textContent="Network error — please try again.";
-  });
-}
-</script>
-
-<!-- Booking modal -->
-<div id="bookModal" style="display:none;position:fixed;inset:0;background:rgba(6,6,7,.78);z-index:50;align-items:center;justify-content:center;padding:20px">
-  <div style="background:var(--bone);max-width:460px;width:100%;border-radius:4px;padding:26px;max-height:90vh;overflow:auto">
-    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
-      <div>
-        <div class="bm-title" style="font-family:var(--display);font-size:20px;font-weight:600"></div>
-        <div class="bm-sub" style="color:var(--muted);font-size:14px"></div>
-      </div>
-      <button onclick="closeBooking()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);line-height:1">×</button>
-    </div>
-    <div class="bm-body">
-      <div style="display:flex;align-items:center;gap:12px;margin:16px 0">
-        <label style="font-size:13px;color:var(--muted)">Tickets</label>
-        <select id="bm-qty" onchange="updateTotal()" style="padding:8px;border:1px solid var(--line);border-radius:2px;font:inherit"></select>
-        <span style="margin-left:auto;font-family:var(--display);font-size:20px;font-weight:600" class="bm-total"></span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <input id="bm-fn" placeholder="First name" style="padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit">
-        <input id="bm-ln" placeholder="Last name" style="padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit">
-      </div>
-      <input id="bm-email" type="email" placeholder="Email" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit;margin-top:10px;box-sizing:border-box">
-      <input id="bm-phone" type="tel" placeholder="Contact phone" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:2px;font:inherit;margin-top:10px;box-sizing:border-box">
-      <label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--muted)">
-        <input id="bm-agree" type="checkbox" style="margin-top:3px">
-        <span>I'd like Grove Event Corp to <strong>hold these seats</strong> and contact me to complete the booking. Official tickets only.</span>
-      </label>
-      <p class="bm-msg" style="font-size:13px;margin:12px 0 0;min-height:16px"></p>
-      <button class="bm-submit enquire" onclick="submitBooking()" style="width:100%;margin-top:8px;padding:12px;border:none;cursor:pointer">Request these seats</button>
-    </div>
+<!-- booking sheet -->
+<div class="sheet-bg" id="sheetBg" onclick="closeBooking()"></div>
+<div class="sheet" id="sheet">
+  <button class="close" onclick="closeBooking()">&times;</button>
+  <div class="bm-body">
+    <div class="eyebrow bm-sub"></div>
+    <h3 class="bm-title" style="margin:4px 0 0"></h3>
+    <div class="total"><span>Tickets
+      <select id="bm-qty" onchange="updateTotal()" style="display:inline-block;width:auto;min-height:40px;margin-left:8px"></select></span>
+      <b class="bm-total"></b></div>
+    <div class="field"><input id="bm-fn" placeholder="First name" autocomplete="given-name"></div>
+    <div class="field"><input id="bm-ln" placeholder="Last name" autocomplete="family-name"></div>
+    <div class="field"><input id="bm-email" type="email" placeholder="Email" autocomplete="email"></div>
+    <div class="field"><input id="bm-phone" type="tel" placeholder="Contact phone" autocomplete="tel"></div>
+    <label class="agree"><input id="bm-agree" type="checkbox">
+      <span>I'd like Grove Event Corp to <strong>hold these seats</strong> and contact me to complete the booking. Official tickets only.</span></label>
+    <p class="bm-msg"></p>
+    <button class="btn btn-primary btn-block bm-submit" onclick="submitBooking()">Request these seats</button>
   </div>
 </div>
+
+<script>
+var EV=null;
+var params=new URLSearchParams(location.search), eventId=params.get("event");
+var board=document.getElementById("board");
+function money(cur,a){ var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur]||(cur+" "); return s+Number(a).toLocaleString("en-GB"); }
+function fmtDate(iso){ if(!iso)return""; try{return new Date(iso).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"})+" · "+new Date(iso).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});}catch(e){return"";} }
+
+if(!eventId){ board.innerHTML='<div class="state">No event specified.</div>'; }
+else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId))
+ .then(function(r){return r.json();})
+ .then(function(data){
+   if(data && data.warming){ board.innerHTML='<div class="state">Prices are updating…</div>'; setTimeout(function(){location.reload();},12000); return; }
+   var p=data.products && data.products[0]; if(!p) throw 0; EV=p;
+   document.title=p.name+" — Grove Event Corp";
+   document.getElementById("title").textContent=p.name;
+   document.getElementById("meta").textContent=fmtDate(p.date);
+
+   if(p.sold_out){
+     board.innerHTML='<div class="card"><div class="chip chip-out">Currently sold out</div>'
+       +'<p style="margin-top:12px">New allocation can be released before the match. '
+       +'<a href="/#contact" style="color:var(--accent);font-weight:600">Register interest &rarr;</a></p></div>';
+   } else {
+     var rows=p.options.map(function(o,i){
+       return '<div class="opt"><div><div class="oname">'+o.name+'</div>'
+         +'<div class="oqty">Up to '+o.max_qty+' tickets</div></div>'
+         +'<div style="display:flex;align-items:center;gap:14px">'
+         +'<div class="oprice">'+money(p.currency,o.price)+'</div>'
+         +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onclick="openBooking('+i+')">Request</button>'
+         +'</div></div>';
+     }).join("");
+     board.innerHTML='<div class="card"><div class="eyebrow">Seating &amp; packages</div>'
+       +'<h3 style="margin:6px 0 6px">From '+money(p.currency,p.from)+' per ticket</h3>'+rows+'</div>';
+     document.getElementById("note").hidden=false;
+   }
+
+   // Stadium map
+   if(p.venue && p.venue.lat && p.venue.lng){
+     var la=p.venue.lat, ln=p.venue.lng, d=0.008;
+     var bbox=(ln-d)+","+(la-d/2)+","+(ln+d)+","+(la+d/2);
+     var osm="https://www.openstreetmap.org/export/embed.html?bbox="+bbox+"&layer=mapnik&marker="+la+","+ln;
+     var gmaps="https://www.google.com/maps/search/?api=1&query="+la+","+ln;
+     document.getElementById("mapwrap").innerHTML=
+       '<div class="card mapcard" style="margin-top:14px;padding:0">'
+       +'<iframe class="map" loading="lazy" src="'+osm+'"></iframe>'
+       +'<div style="padding:14px 16px"><h3 style="margin:0">'+(p.venue.name||"Stadium")+'</h3>'
+       +'<div class="venue-addr">'+(p.venue.address||"")+' &middot; <a href="'+gmaps+'" target="_blank" rel="noopener">Open in Maps &rarr;</a></div></div></div>';
+   }
+ })
+ .catch(function(){ board.innerHTML='<div class="state">Live prices are temporarily unavailable. Please <a href="/#contact" style="color:var(--accent)">enquire</a> and we\'ll quote you directly.</div>'; });
+
+function openBooking(i){
+  var o=EV.options[i], maxQ=Math.min(o.max_qty||6,6), q="";
+  for(var k=1;k<=maxQ;k++) q+='<option value="'+k+'">'+k+'</option>';
+  var s=document.getElementById("sheet");
+  s.querySelector(".bm-title").textContent=o.name;
+  s.querySelector(".bm-sub").textContent=EV.name;
+  s.dataset.opt=o.ticket_option; s.dataset.unit=o.price; s.dataset.cur=EV.currency;
+  s.querySelector("#bm-qty").innerHTML=q; s.querySelector(".bm-msg").textContent="";
+  updateTotal();
+  document.getElementById("sheetBg").classList.add("open"); s.classList.add("open");
+}
+function closeBooking(){ document.getElementById("sheet").classList.remove("open"); document.getElementById("sheetBg").classList.remove("open"); }
+function updateTotal(){ var s=document.getElementById("sheet"); var q=parseInt(s.querySelector("#bm-qty").value,10)||1;
+  s.querySelector(".bm-total").textContent=money(s.dataset.cur,q*parseFloat(s.dataset.unit||0)); }
+function submitBooking(){
+  var s=document.getElementById("sheet"), msg=s.querySelector(".bm-msg"), btn=s.querySelector(".bm-submit");
+  var data={ ticket_option:parseInt(s.dataset.opt,10), quantity:parseInt(s.querySelector("#bm-qty").value,10),
+    first_name:s.querySelector("#bm-fn").value, last_name:s.querySelector("#bm-ln").value,
+    email:s.querySelector("#bm-email").value, phone:s.querySelector("#bm-phone").value };
+  if(!s.querySelector("#bm-agree").checked){ msg.style.color="var(--danger)"; msg.textContent="Please tick the box to continue."; return; }
+  msg.style.color="var(--muted)"; msg.textContent="Holding your seats…"; btn.disabled=true;
+  fetch("/.netlify/functions/tc-reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)})
+   .then(function(r){return r.json();}).then(function(res){ btn.disabled=false;
+     if(res.ok){ s.querySelector(".bm-body").innerHTML='<div style="text-align:center;padding:8px 0">'
+       +'<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:8px">Seats requested &check;</div>'
+       +'<p>Reference <strong>'+res.reservation_num+'</strong> — '+money(res.currency,res.total)+'.</p>'
+       +'<p class="small">We\'ve placed a short hold and will contact you shortly to confirm and take payment. Nothing is charged yet. '
+       +'Questions? <a href="mailto:orders@grovecorp.org" style="color:var(--accent)">orders@grovecorp.org</a></p>'
+       +'<button class="btn btn-ghost btn-block" onclick="closeBooking()" style="margin-top:8px">Done</button></div>'; }
+     else { msg.style.color="var(--danger)"; msg.textContent=res.error||"Something went wrong. Please try again."; }
+   }).catch(function(){ btn.disabled=false; msg.style.color="var(--danger)"; msg.textContent="Network error — please try again."; });
+}
+</script>
 </body>
 </html>
