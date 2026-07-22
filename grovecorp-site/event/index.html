@@ -7,8 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<title>Event — Grove Event Corp</title>
-<meta name="description" content="Live prices and official tickets for Premier League matches. Grove Event Corp." />
+<title>Event — Bucket List Exp</title>
+<meta name="description" content="Live prices and official tickets for Premier League matches. Bucket List Exp." />
 <style>
 :root{
   --paper:#F6F4EF; --card:#FFFFFF; --ink:#0E1826; --ink-2:#3B4657;
@@ -148,12 +148,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 
 /* THEME */
 :root{ --accent:#C8102E; --accent-dk:#9E0C24; --accent-soft:#FBE7EA; } .btn-primary{background:var(--blue)} .btn-primary:hover{background:var(--blue-dk)} .price{color:var(--blue-dk)} .row:hover{border-left-color:var(--blue)} .go{color:var(--accent)} .chip{background:var(--blue-soft);color:var(--blue-dk)} .eyebrow{color:var(--blue)} .herobox::before{background:linear-gradient(var(--blue),var(--accent))} .brand span{color:var(--blue)}
+.descbody{font-size:15px;color:var(--ink-2)}.descbody p{margin:0 0 10px}.descbody ul{margin:0 0 10px 18px;padding:0}.descbody li{margin:2px 0}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap bar">
-    <a class="brand" href="/">Grove <span>Event Corp</span></a>
+    <a class="brand" href="/">Bucket List <span>Exp</span></a>
     <a class="navlink" href="/premier-league/">&larr; Fixtures</a>
   </div>
 </header>
@@ -172,7 +173,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   <p class="small" id="note" hidden style="margin-top:18px">Prices are live from our supplier, per ticket, package inclusive. Availability and price are confirmed when we contact you. Official tickets only.</p>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd</div></footer>
+<footer><div class="wrap">&copy; 2026 Bucket List Exp (Pty) Ltd</div></footer>
 
 <!-- booking sheet -->
 <div class="sheet-bg" id="sheetBg" onclick="closeBooking()"></div>
@@ -189,7 +190,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
     <div class="field"><input id="bm-email" type="email" placeholder="Email" autocomplete="email"></div>
     <div class="field"><input id="bm-phone" type="tel" placeholder="Contact phone" autocomplete="tel"></div>
     <label class="agree"><input id="bm-agree" type="checkbox">
-      <span>I'd like Grove Event Corp to <strong>hold these seats</strong> and contact me to complete the booking. Official tickets only.</span></label>
+      <span>I'd like Bucket List Exp to <strong>hold these seats</strong> and contact me to complete the booking. Official tickets only.</span></label>
     <p class="bm-msg"></p>
     <button class="btn btn-primary btn-block bm-submit" onclick="submitBooking()">Request these seats</button>
   </div>
@@ -208,7 +209,7 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
  .then(function(data){
    if(data && data.warming){ board.innerHTML='<div class="state">Prices are updating…</div>'; setTimeout(function(){location.reload();},12000); return; }
    var p=data.products && data.products[0]; if(!p) throw 0; EV=p;
-   document.title=p.name+" — Grove Event Corp";
+   document.title=p.name+" — Bucket List Exp";
    document.getElementById("title").textContent=p.name;
    document.getElementById("meta").textContent=fmtDate(p.date);
 
@@ -228,6 +229,18 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
      board.innerHTML='<div class="card"><div class="eyebrow">Seating &amp; packages</div>'
        +'<h3 style="margin:6px 0 6px">From '+money(p.currency,p.from)+' per ticket</h3>'+rows+'</div>';
      document.getElementById("note").hidden=false;
+   }
+
+   // Package description (from API — shows only when populated)
+   if(p.description){
+     var parts=[];
+     if(p.description.information) parts.push('<div><h3>About this package</h3><div class="descbody">'+p.description.information+'</div></div>');
+     if(p.description.timetable)   parts.push('<div style="margin-top:14px"><h3>Timetable</h3><div class="descbody">'+p.description.timetable+'</div></div>');
+     if(p.description.notes)       parts.push('<div style="margin-top:14px"><h3>Good to know</h3><div class="descbody">'+p.description.notes+'</div></div>');
+     if(parts.length){
+       var dc=document.createElement('div'); dc.className='card'; dc.style.marginTop='14px';
+       dc.innerHTML=parts.join(''); document.getElementById('mapwrap').appendChild(dc);
+     }
    }
 
    // Stadium map
