@@ -26,7 +26,8 @@ async function venueById(vid, t, store) {
     if (!r.ok) return null;
     const v = (await r.json()).data || {};
     const data = { name: v.name || null, address: v.address || null, city: v.city || null,
-                   lat: v.coordinates?.lat ?? null, lng: v.coordinates?.lng ?? null };
+                   lat: v.coordinates?.lat ?? null, lng: v.coordinates?.lng ?? null,
+                   seating: v.images?.seating || v.images?.stadium || null };
     try { await store.setJSON("venue-" + vid, { at: Date.now(), data }); } catch (_) {}
     return data;
   } catch (_) { return null; }
@@ -43,9 +44,11 @@ async function detailFor(id, store) {
     if (!r.ok) return null;
     const d = (await r.json()).data || {};
     const venue = await venueById(d.venue, t, store);
+    const sp = d.seating_plan || {};
     const data = {
       description: { information: d.information || null, notes: d.notes || null, timetable: d.timetable || null },
       venue,
+      seating_image: sp.image || (venue && venue.seating) || null,
     };
     try { await store.setJSON("detail-" + id, { at: Date.now(), data }); } catch (_) {}
     return data;
@@ -86,6 +89,7 @@ export default async (req) => {
     return {
       id,
       venue: (detail && detail.venue) || null,
+      seating_image: (detail && detail.seating_image) || null,
       description: (detail && detail.description) || null,
       name: m.name || `Event ${id}`,
       date: m.date || null,
