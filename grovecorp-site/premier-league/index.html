@@ -2,182 +2,177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Premier League Fixtures — Grove Event Corp</title>
-<meta name="description" content="Every upcoming Premier League fixture with official-ticket packages from South Africa — Grove Event Corp." />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F7F5F0" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>Premier League Fixtures &amp; Prices — Grove Event Corp</title>
+<meta name="description" content="Every upcoming Premier League fixture with live package prices, from Johannesburg. Official tickets only." />
 <style>
-  :root{
-    --ink:#F2EFE6;
-    --paper:#0B0B0C;
-    --bone:#141416;
-    --raise:#1A1A1D;
-    --green:#C9A063;
-    --gold:#8C6A3A;
-    --line:rgba(242,239,230,.12);
-    --muted:rgba(242,239,230,.55);
-    --display:'Anton',sans-serif;
-    --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
-    --mono:'IBM Plex Mono',monospace;
+:root{
+  --paper:#F7F5F0; --card:#FFFFFF; --ink:#131B19; --ink-2:#3F4C49;
+  --muted:#6E7B77; --line:#E5E0D6; --line-2:#EFEBE3;
+  --accent:#0F6E62; --accent-dk:#0A544A; --accent-soft:#E9F1EF;
+  --danger:#B4472B; --r:10px;
+  --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
 }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.55;-webkit-font-smoothing:antialiased}
-  a{color:inherit;text-decoration:none}
-  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
-  header{border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brand{font-family:var(--display);font-weight:600;font-size:19px}
-  .back{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .back:hover{color:var(--ink)}
-  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--green);font-weight:600}
-  .eyebrow .dot{color:var(--gold);margin:0 6px}
-  .hero{padding:52px 0 26px}
-  .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(30px,5vw,50px);line-height:1.05;margin:12px 0 12px}
-  .hero h1 em{font-style:normal;color:var(--green)}
-  .hero p{color:var(--muted);max-width:60ch;margin:0}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+img,iframe{max-width:100%}
+.wrap{max-width:1000px;margin:0 auto;padding:0 18px}
+.narrow{max-width:680px}
 
-  /* controls */
-  .controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:6px 0 22px}
-  .controls input{flex:1;min-width:200px;padding:11px 14px;border:1px solid var(--line);border-radius:2px;font:inherit}
-  .count{font-size:13px;color:var(--muted)}
+/* header */
+header{position:sticky;top:0;z-index:30;background:rgba(247,245,240,.92);
+  backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:58px}
+.brand{font-weight:700;letter-spacing:-.02em;font-size:17px}
+.brand span{color:var(--accent)}
+.navlink{font-size:14px;color:var(--muted);padding:10px 2px}
+.navlink:hover{color:var(--ink)}
 
-  /* fixture rows */
-  .list{border-top:1px solid var(--line)}
-  .fx{display:grid;grid-template-columns:96px 1fr auto auto;gap:16px;align-items:center;
-      padding:16px 4px;border-bottom:1px solid var(--line);transition:background .12s}
-  .fx:hover{background:var(--raise)}
-  .fx .date{font-size:12px;letter-spacing:.04em;color:var(--muted);line-height:1.3}
-  .fx .date b{display:block;color:var(--ink);font-size:13px;font-weight:600}
-  .fx .name{font-family:var(--sans);letter-spacing:-.01em;font-size:18px;font-weight:600}
-  .fx .name em{font-style:normal;color:var(--green);font-weight:600}
-  .fx .from{text-align:right;white-space:nowrap}
-  .fx .from .lab{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .fx .from .amt{font-family:var(--mono);font-size:18px;font-weight:600}
-  .fx .go{justify-self:end;font-size:13px;color:var(--green);border:1px solid var(--green);border-radius:2px;padding:8px 14px}
-  .fx:hover .go{background:var(--green);color:#0B0B0C}
-  .soldout{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#E0785F}
-  .month{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;padding:26px 4px 8px}
+/* buttons — 48px tap targets */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:48px;padding:0 20px;border-radius:var(--r);font-size:15px;font-weight:600;
+  border:1px solid transparent;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dk)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--ink-2)}
+.btn-block{width:100%}
 
-  .state{padding:48px 4px;color:var(--muted);text-align:center}
-  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-size:13px;margin-top:24px}
+/* type */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--accent);font-weight:500}
+h1{font-size:clamp(30px,7vw,46px);line-height:1.1;letter-spacing:-.025em;font-weight:700;margin:12px 0 14px}
+h2{font-size:clamp(23px,4.6vw,31px);line-height:1.18;letter-spacing:-.02em;font-weight:700;margin:10px 0 12px}
+h3{font-size:18px;line-height:1.3;letter-spacing:-.01em;font-weight:600;margin:0 0 6px}
+p{margin:0 0 14px;color:var(--ink-2)}
+.lede{font-size:18px;color:var(--ink-2)}
+.small{font-size:14px;color:var(--muted)}
+.section{padding:44px 0}
+.section + .section{border-top:1px solid var(--line)}
+@media(min-width:820px){ .section{padding:72px 0} }
 
-  @media(max-width:640px){
-    .fx{grid-template-columns:64px 1fr;row-gap:6px}
-    .fx .from{grid-column:2;text-align:left}
-    .fx .go{grid-column:1 / -1;justify-self:stretch;text-align:center}
-  }
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.grid{display:grid;gap:14px}
+@media(min-width:760px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
 
-  /* --- dark luxe refinements --- */
-  .brand,.hero h1{font-family:var(--display);letter-spacing:.01em;text-transform:uppercase}
-  .hero h1{font-weight:400;line-height:1.02}
-  .hero h1 em{font-style:normal;color:var(--green)}
-  input,select,textarea{background:var(--raise);color:var(--ink);border:1px solid var(--line)}
-  input::placeholder{color:var(--muted)}
-  input:focus,select:focus{outline:2px solid var(--green);outline-offset:1px}
-  ::selection{background:var(--green);color:#0B0B0C}
-  a:focus-visible,button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
-  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* stats */
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 22px;padding:0;list-style:none}
+.stats li{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:10px 14px;font-size:14px;color:var(--muted)}
+.stats b{display:block;font-family:var(--mono);font-size:17px;color:var(--ink);font-weight:500}
+
+/* list rows (fixtures) */
+.rows{margin-top:6px}
+.row{display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:14px 16px;margin-bottom:10px;transition:border-color .15s,transform .08s}
+.row:hover{border-color:var(--accent)}
+.row:active{transform:scale(.995)}
+.row-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.row-date{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.row-name{font-size:17px;font-weight:600;letter-spacing:-.01em;margin:4px 0 0}
+.row-venue{font-size:13px;color:var(--muted);margin-top:2px}
+.row-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.price{font-family:var(--mono);font-size:17px;font-weight:500}
+.price .lbl{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:var(--sans);font-weight:600}
+.go{font-size:14px;font-weight:600;color:var(--accent)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;padding:4px 8px;border-radius:6px;background:var(--accent-soft);color:var(--accent-dk)}
+.chip-out{background:#FBEEEA;color:var(--danger)}
+.groupline{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--muted);margin:26px 0 10px}
+
+/* forms */
+input,select,textarea{width:100%;min-height:48px;padding:12px 14px;font:inherit;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+textarea{min-height:110px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+label.fl{display:block;font-size:13px;font-weight:600;margin:0 0 6px}
+.field{margin-bottom:14px}
+
+/* states */
+.state{padding:34px 4px;text-align:center;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
+::selection{background:var(--accent-soft)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.searchbar{position:sticky;top:58px;z-index:20;background:var(--paper);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.count{font-size:13px;color:var(--muted);margin-top:8px}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap bar">
-    <a class="brand" href="/">Grove Event Corp</a>
-    <a class="back" href="/#packages">← All packages</a>
+    <a class="brand" href="/">Grove <span>Event Corp</span></a>
+    <a class="navlink" href="/">&larr; Home</a>
   </div>
 </header>
 
 <main class="wrap">
-  <div class="hero">
-    <div class="eyebrow">England <span class="dot">·</span> Football <span class="dot">·</span> Official tickets only</div>
-    <h1>Premier League <em>weekends,</em> done properly</h1>
-    <p>Every upcoming fixture, with official-ticket packages built from Johannesburg. Live prices below — pick a match to see full category options and enquire.</p>
+  <section style="padding:26px 0 4px">
+    <div class="eyebrow">England &middot; Football &middot; Official tickets</div>
+    <h1>Premier League fixtures</h1>
+    <p class="lede narrow">Live prices, updated through the day. Tap a fixture for full seating options and to request seats.</p>
+  </section>
+
+  <div class="searchbar">
+    <input id="search" type="search" placeholder="Search a club — Arsenal, Liverpool…" aria-label="Search fixtures">
+    <div class="count" id="count"></div>
   </div>
 
-  <div class="controls">
-    <input id="search" type="search" placeholder="Search a club — Arsenal, Liverpool, Newcastle…" aria-label="Search fixtures" />
-    <span class="count" id="count"></span>
-  </div>
-
-  <div id="list" class="list"><div class="state">Loading Premier League fixtures…</div></div>
+  <div id="list" class="rows"><div class="state">Loading fixtures…</div></div>
 </main>
 
-<footer>
-  <div class="wrap">© 2026 Grove Event Corp (Pty) Ltd · Johannesburg — Sport · Music · Travel</div>
-</footer>
+<footer><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd &middot; Official tickets only</div></footer>
 
 <script>
-(function(){
-  var listEl = document.getElementById("list");
-  var countEl = document.getElementById("count");
-  var searchEl = document.getElementById("search");
-  var ALL = [];
-
-  function money(a,cur){ var s={GBP:"£",EUR:"€",USD:"$",ZAR:"R",AUD:"A$"}[cur||"GBP"]||((cur||"")+" "); return s + Number(a).toLocaleString("en-GB"); }
-  function d(iso){ return new Date(iso); }
-  function dayLabel(iso){
-    var dt=d(iso);
-    return { dow: dt.toLocaleDateString("en-GB",{weekday:"short"}),
-             day: dt.toLocaleDateString("en-GB",{day:"numeric",month:"short"}) };
-  }
-  function monthKey(iso){ return d(iso).toLocaleDateString("en-GB",{month:"long",year:"numeric"}); }
-  function nameHTML(n){ return n.replace(/ v /, ' <em>v</em> '); }
-
-  function render(rows){
-    if(!rows.length){ listEl.innerHTML='<div class="state">No fixtures match that search.</div>'; countEl.textContent=""; return; }
-    var html=""; var lastMonth="";
-    rows.forEach(function(f){
-      var mk=monthKey(f.date);
-      if(mk!==lastMonth){ html+='<div class="month">'+mk+'</div>'; lastMonth=mk; }
-      var dl=dayLabel(f.date);
-      var right;
-      if(f.sold_out){
-        right = '<div class="from"><span class="soldout">Sold out</span></div><a class="go" href="/event/?event='+f.id+'">Register</a>';
-      } else if(f.from){
-        right = '<div class="from"><span class="lab">From</span><span class="amt">'+money(f.from,f.currency)+'</span></div><a class="go" href="/event/?event='+f.id+'">View →</a>';
-      } else {
-        // Not priced up front (further-out fixture) — price loads on the event page.
-        right = '<div class="from"></div><a class="go" href="/event/?event='+f.id+'">See options →</a>';
-      }
-      html+='<a class="fx" href="/event/?event='+f.id+'">'
-        + '<div class="date">'+dl.dow+' <b>'+dl.day+'</b></div>'
-        + '<div class="name">'+nameHTML(f.name)+'</div>'
-        + right + '</a>';
-    });
-    listEl.innerHTML=html;
-    countEl.textContent = rows.length + " fixture" + (rows.length!==1?"s":"");
-  }
-
-  function applySearch(){
-    var q=searchEl.value.trim().toLowerCase();
-    render(q ? ALL.filter(function(f){ return f.name.toLowerCase().indexOf(q)>-1; }) : ALL);
-  }
-
-  var ctrl = new AbortController();
-  var timer = setTimeout(function(){ ctrl.abort(); }, 20000); // give the first (uncached) load room
-
-  fetch("/.netlify/functions/tc-fixtures?competition=401", { signal: ctrl.signal })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      clearTimeout(timer);
-      if(data && data.warming){
-        listEl.innerHTML='<div class="state">Prices are updating — this refreshes automatically in a few seconds…</div>';
-        setTimeout(function(){ location.reload(); }, 12000);
-        return;
-      }
-      ALL = data.fixtures || [];
-      if(!ALL.length){ listEl.innerHTML='<div class="state">No upcoming fixtures right now — check back soon.</div>'; return; }
-      render(ALL);
-    })
-    .catch(function(){
-      clearTimeout(timer);
-      listEl.innerHTML='<div class="state">Fixtures are temporarily unavailable. Please <a href="/#contact" style="color:var(--green)">get in touch</a> and we\'ll help directly.</div>';
-    });
-
-  searchEl.addEventListener("input", applySearch);
-})();
+var listEl=document.getElementById("list"), countEl=document.getElementById("count"), searchEl=document.getElementById("search"), ALL=[];
+function money(a,cur){ var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur||"GBP"]||((cur||"")+" "); return s+Number(a).toLocaleString("en-GB"); }
+function dparts(iso){ var d=new Date(iso);
+  return { d:d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}),
+           t:d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"}),
+           m:d.toLocaleDateString("en-GB",{month:"long",year:"numeric"}) }; }
+function render(rows){
+  if(!rows.length){ listEl.innerHTML='<div class="state">No fixtures match that search.</div>'; countEl.textContent=""; return; }
+  var h="", lastM="";
+  rows.forEach(function(f){
+    var p=dparts(f.date);
+    if(p.m!==lastM){ h+='<div class="groupline">'+p.m+'</div>'; lastM=p.m; }
+    var right = f.sold_out ? '<span class="chip chip-out">Sold out</span>'
+      : (f.from ? '<span class="price"><span class="lbl">From</span>'+money(f.from,f.currency)+'</span>'
+                : '<span class="chip">See options</span>');
+    h+='<a class="row" href="/event/?event='+f.id+'">'
+      +'<div class="row-top"><span class="row-date">'+p.d+' &middot; '+p.t+'</span></div>'
+      +'<div class="row-name">'+f.name+'</div>'
+      +'<div class="row-bottom">'+right+'<span class="go">View &rarr;</span></div></a>';
+  });
+  listEl.innerHTML=h;
+  countEl.textContent=rows.length+" fixture"+(rows.length!==1?"s":"");
+}
+function applySearch(){ var q=searchEl.value.trim().toLowerCase();
+  render(q?ALL.filter(function(f){return f.name.toLowerCase().indexOf(q)>-1;}):ALL); }
+searchEl.addEventListener("input", applySearch);
+var ctrl=new AbortController(), timer=setTimeout(function(){ctrl.abort();},20000);
+fetch("/.netlify/functions/tc-fixtures?competition=401",{signal:ctrl.signal})
+ .then(function(r){return r.json();})
+ .then(function(data){ clearTimeout(timer);
+   if(data && data.warming){ listEl.innerHTML='<div class="state">Prices are updating — this refreshes automatically…</div>'; setTimeout(function(){location.reload();},12000); return; }
+   ALL=data.fixtures||[];
+   if(!ALL.length){ listEl.innerHTML='<div class="state">No upcoming fixtures right now.</div>'; return; }
+   render(ALL);
+ })
+ .catch(function(){ clearTimeout(timer);
+   listEl.innerHTML='<div class="state">Fixtures are temporarily unavailable. Please <a href="/#contact" style="color:var(--accent)">get in touch</a>.</div>'; });
 </script>
 </body>
 </html>
