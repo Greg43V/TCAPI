@@ -15,10 +15,26 @@ async function token() {
   if (!r.ok) throw new Error("auth");
   const j = await r.json(); _tok = j.access_token; _tokExp = Date.now() + 3000 * 1000; return _tok;
 }
-async function detailFor(id, store) {
-  // cache descriptions for 6h so we don't refetch on every view
+async function venueById(vid, t, store) {
+  if (!vid) return null;
   try {
-    const c = await store.get("desc-" + id, { type: "json" });
+    const c = await store.get("venue-" + vid, { type: "json" });
+    if (c && Date.now() - c.at < 30 * 24 * 3600 * 1000) return c.data;  // venues are static; cache 30d
+  } catch (_) {}
+  try {
+    const r = await fetch(`${BASE}/venues/${vid}`, { headers: { authorization: `Bearer ${t}`, accept: "application/json" } });
+    if (!r.ok) return null;
+    const v = (await r.json()).data || {};
+    const data = { name: v.name || null, address: v.address || null, city: v.city || null,
+                   lat: v.coordinates?.lat ?? null, lng: v.coordinates?.lng ?? null };
+    try { await store.setJSON("venue-" + vid, { at: Date.now(), data }); } catch (_) {}
+    return data;
+  } catch (_) { return null; }
+}
+async function detailFor(id, store) {
+  // cache the whole detail bundle (description + venue) for 6h
+  try {
+    const c = await store.get("detail-" + id, { type: "json" });
     if (c && Date.now() - c.at < 6 * 3600 * 1000) return c.data;
   } catch (_) {}
   try {
@@ -26,8 +42,12 @@ async function detailFor(id, store) {
     const r = await fetch(`${BASE}/product/${id}`, { headers: { authorization: `Bearer ${t}`, accept: "application/json" } });
     if (!r.ok) return null;
     const d = (await r.json()).data || {};
-    const data = { information: d.information || null, notes: d.notes || null, timetable: d.timetable || null };
-    try { await store.setJSON("desc-" + id, { at: Date.now(), data }); } catch (_) {}
+    const venue = await venueById(d.venue, t, store);
+    const data = {
+      description: { information: d.information || null, notes: d.notes || null, timetable: d.timetable || null },
+      venue,
+    };
+    try { await store.setJSON("detail-" + id, { at: Date.now(), data }); } catch (_) {}
     return data;
   } catch (_) { return null; }
 }
@@ -62,12 +82,11 @@ export default async (req) => {
     const cats = (byId[id] || []).filter((c) => c.available)
       .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option }))
       .sort((a, b) => a.price - b.price);
-    const venue = (venues && venues.byId && m.venue) ? venues.byId[m.venue] : null;
-    const description = await detailFor(id, store);
+    const detail = await detailFor(id, store);
     return {
       id,
-      venue: venue || null,
-      description: description || null,
+      venue: (detail && detail.venue) || null,
+      description: (detail && detail.description) || null,
       name: m.name || `Event ${id}`,
       date: m.date || null,
       currency: m.currency || "GBP",
