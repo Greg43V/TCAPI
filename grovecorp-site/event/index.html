@@ -232,7 +232,7 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
          +'<div class="oqty">Up to '+o.max_qty+' tickets</div></div>'
          +'<div style="display:flex;align-items:center;gap:14px">'
          +'<div class="oprice">'+money(p.currency,o.price)+'</div>'
-         +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onmouseenter="highlightCategory('+i+')" onclick="highlightCategory('+i+');openBooking('+i+')">Request</button>'
+         +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onclick="openBooking('+i+')">Request</button>'
          +'</div></div>';
      }).join("");
      board.innerHTML='<div class="card"><div class="eyebrow">Seating &amp; packages</div>'
@@ -250,27 +250,17 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
    var dc=document.createElement('div'); dc.className='card'; dc.style.marginTop='14px';
    dc.innerHTML=parts.join(''); document.getElementById('mapwrap').appendChild(dc);
 
-   // Seating plan — primary. If it's an SVG we inline it so sections can highlight.
+   // Seating plan — primary. Shown as an image (cross-origin fetch is blocked,
+   // but the image displays fine directly). Tap to enlarge.
    if(p.seating_image){
      var sp=document.createElement('div'); sp.className='card'; sp.style.marginTop='14px';
      sp.innerHTML='<div class="eyebrow">Where you\'ll sit</div>'
        +'<h3 style="margin:6px 0 8px">Stadium seating plan</h3>'
-       +'<div id="planhost" style="border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff"></div>'
-       +'<p class="small" id="planhint" style="margin:10px 0 0">Tap a package above to highlight its seating area.</p>';
+       +'<a href="'+p.seating_image+'" target="_blank" rel="noopener" style="display:block;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:#fff">'
+       +'<img src="'+p.seating_image+'" alt="Stadium seating plan" loading="lazy" '
+       +'style="width:100%;display:block" onerror="this.closest(\'.card\').style.display=\'none\'"></a>'
+       +'<p class="small" style="margin:10px 0 0">The plan shows the stadium\'s seating categories. Tap to enlarge. Your category is named in the price list above.</p>';
      document.getElementById("mapwrap").appendChild(sp);
-     var host=document.getElementById("planhost");
-     var isSvg=/\.svg(\?|$)/i.test(p.seating_image);
-     if(isSvg){
-       fetch(p.seating_image).then(function(r){return r.ok?r.text():Promise.reject();}).then(function(svg){
-         host.innerHTML=svg;
-         var el=host.querySelector("svg"); if(el){ el.style.width="100%"; el.style.height="auto"; el.style.display="block"; }
-         window.__plan=host;
-       }).catch(function(){ // fallback to flat image
-         host.innerHTML='<a href="'+p.seating_image+'" target="_blank" rel="noopener"><img src="'+p.seating_image+'" style="width:100%;display:block" alt="Seating plan"></a>';
-       });
-     } else {
-       host.innerHTML='<a href="'+p.seating_image+'" target="_blank" rel="noopener"><img src="'+p.seating_image+'" style="width:100%;display:block" alt="Seating plan" onerror="this.closest(\'.card\').style.display=\'none\'"></a>';
-     }
    }
 
    // Location map — secondary, smaller
