@@ -36,7 +36,7 @@ export default async (req) => {
       id,
       name: m.name || `Event ${id}`,
       date: m.date || null,
-      currency: "GBP",
+      currency: m.currency || "GBP",
       sold_out: cats.length === 0,
       from: cats.length ? cats[0].price : null,
       options: cats,
