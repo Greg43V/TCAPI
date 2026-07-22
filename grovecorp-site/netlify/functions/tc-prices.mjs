@@ -49,6 +49,7 @@ async function detailFor(id, store) {
       description: { information: d.information || null, notes: d.notes || null, timetable: d.timetable || null },
       venue,
       seating_image: sp.image || (venue && venue.seating) || null,
+      category_map: Array.isArray(sp.category_map) ? sp.category_map : null,
     };
     try { await store.setJSON("detail-" + id, { at: Date.now(), data }); } catch (_) {}
     return data;
@@ -83,13 +84,14 @@ export default async (req) => {
   const out = await Promise.all(ids.map(async (id) => {
     const m = meta[id] || {};
     const cats = (byId[id] || []).filter((c) => c.available)
-      .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option }))
+      .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option, ticket_category: c.ticket_category }))
       .sort((a, b) => a.price - b.price);
     const detail = await detailFor(id, store);
     return {
       id,
       venue: (detail && detail.venue) || null,
       seating_image: (detail && detail.seating_image) || null,
+      category_map: (detail && detail.category_map) || null,
       description: (detail && detail.description) || null,
       name: m.name || `Event ${id}`,
       date: m.date || null,
