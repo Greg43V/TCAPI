@@ -138,6 +138,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 .step .n{font-family:var(--mono);color:var(--accent);font-size:14px;padding-top:2px}
 .meta{display:grid;gap:6px;margin:0 0 22px;padding:0;list-style:none;font-size:14px;color:var(--muted)}
 .meta b{color:var(--ink);font-weight:600}
+
+/* black accents */
+:root{ --ink-black:#0E0F12; }
+.herobox.dark{background:var(--ink-black);border-color:var(--ink-black);color:#F6F4EF}
+.herobox.dark .eyebrow{color:#7FC9BC}
+.herobox.dark h1{color:#F6F4EF}
+.herobox.dark .lede{color:rgba(246,244,239,.72)}
+.herobox.dark::before{background:linear-gradient(var(--blue),var(--accent))}
+footer.dark{background:var(--ink-black);color:rgba(246,244,239,.6);border-top:none}
 </style>
 </head>
 <body>
@@ -154,9 +163,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 <main>
   <!-- HERO -->
   <section class="wrap" style="padding:26px 0 8px">
-    <div class="herobox">
+    <div class="herobox dark">
       <div class="eyebrow">South Africa &rarr; The World</div>
-      <h1>The match.<br>The music.<br><span style="color:var(--accent)">The mission.</span></h1>
+      <h1>The match.<br>The music.<br><span style="color:#E3C48D">The mission.</span></h1>
       <p class="lede" style="max-width:52ch">Travel packages built around the events worth crossing borders for — official tickets first, then flights, hotels and transfers arranged around them.</p>
       <div>
         <span class="pill" style="background:var(--blue-soft);color:var(--blue-dk)">Premier League</span>
@@ -253,7 +262,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   </section>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd &middot; Johannesburg &mdash; Sport &middot; Music &middot; Travel</div></footer>
+<footer class="dark"><div class="wrap">&copy; 2026 Grove Event Corp (Pty) Ltd &middot; Johannesburg &mdash; Sport &middot; Music &middot; Travel</div></footer>
 
 <script>
 function sendEnquiry(){
