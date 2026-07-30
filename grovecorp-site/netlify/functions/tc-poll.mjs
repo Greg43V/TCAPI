@@ -6,7 +6,7 @@
 // Requirement #2 (rate limit): never more than ~30 TC calls in a single run,
 // plus a rolling-window throttle capping at 50 calls / 60s. Well under TC's 60/min.
 //
-// Runs once per minute (see `export const config` at the bottom). On each run it
+// Runs every 10 minutes (see `export const config` at the bottom). On each run it
 // EITHER refreshes the product list (once an hour) OR refreshes prices (the other
 // 59 minutes) — never both in the same minute, so no minute ever approaches 60 calls.
 //
@@ -217,4 +217,4 @@ export default async () => {
 };
 
 // Run every minute.
-export const config = { schedule: "* * * * *" };
+export const config = { schedule: "*/10 * * * *" };
