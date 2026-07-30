@@ -10,4 +10,4 @@
   included_files = ["package.json"]
 
 [functions."tc-poll"]
-  schedule = "* * * * *"
+  schedule = "*/10 * * * *"
