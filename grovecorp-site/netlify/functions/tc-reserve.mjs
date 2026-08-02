@@ -69,6 +69,10 @@ export default async (req) => {
 
     const d = resJson.data;
     const expiresAt = d.expires_at ? d.expires_at * 1000 : null;
+    const prod = (d.products && d.products[0]) || {};
+    const matchName = prod.name || (`Event (option ${ticket_option})`);
+    const catName = prod.ticket_option || null;
+    const matchDate = prod.tour_date ? new Date(prod.tour_date * 1000).toISOString().slice(0,10) : null;
 
     // Record the enquiry for the agent to action.
     try {
@@ -80,6 +84,7 @@ export default async (req) => {
         currency: d.currency,
         customer: { first_name, last_name, email, phone },
         ticket_option, quantity: qty,
+        match: matchName, category: catName, match_date: matchDate,
         status: "held-awaiting-payment",
       });
     } catch (_) {}
@@ -95,10 +100,12 @@ export default async (req) => {
     if (process.env.TELEGRAM_BOT_TOKEN && process.env.TELEGRAM_CHAT_ID) {
       const text =
         `\u26a0\ufe0f SEATS HELD \u2014 ACTION NEEDED\n\n` +
-        `Ref: ${d.reservation_num}\n` +
-        `Expires: ${expStr}\n` +
-        `Value: ${sym}${d.price_total} ${cur}\n` +
-        `Tickets: ${qty} \u00d7 option ${ticket_option}\n\n` +
+        `\u{1F3DF}\ufe0f ${matchName}\n` +
+        (matchDate ? `\u{1F4C5} ${matchDate}\n` : ``) +
+        `Category: ${catName || ('option ' + ticket_option)}\n` +
+        `Tickets: ${qty}\n` +
+        `Value: ${sym}${d.price_total} ${cur}\n\n` +
+        `Ref: ${d.reservation_num}  (expires ${expStr})\n\n` +
         `${first_name} ${last_name}\n` +
         `\u{1F4DE} ${phone}\n` +
         `\u2709\ufe0f ${email}\n\n` +
@@ -116,6 +123,7 @@ export default async (req) => {
     if (process.env.RESEND_API_KEY) {
       const html =
         `<h2>ACTION NEEDED \u2014 seats held ${d.reservation_num}</h2>` +
+        `<p><strong>${matchName}</strong>${matchDate ? ' \u2014 ' + matchDate : ''}<br>Category: ${catName || ('option ' + ticket_option)}</p>` +
         `<p><strong>This hold expires ${expStr}.</strong></p>` +
         `<p><strong>Value:</strong> ${sym}${d.price_total} ${cur}<br>` +
         `<strong>Tickets:</strong> ${qty} \u00d7 option ${ticket_option}</p>` +
