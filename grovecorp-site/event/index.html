@@ -173,7 +173,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   <p class="small" id="note" hidden style="margin-top:18px">Prices are live from our supplier, per ticket, package inclusive. Availability and price are confirmed when we contact you. Official tickets only.</p>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Grove Event LLC</div></footer>
+<footer><div class="wrap">&copy; 2026 Bucket List Exp</div></footer>
 
 <!-- booking sheet -->
 <div class="sheet-bg" id="sheetBg" onclick="closeBooking()"></div>
@@ -320,8 +320,7 @@ function submitBooking(){
      if(res.ok){ s.querySelector(".bm-body").innerHTML='<div style="text-align:center;padding:8px 0">'
        +'<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:8px">Seats requested &check;</div>'
        +'<p>Reference <strong>'+res.reservation_num+'</strong> — '+money(res.currency,res.total)+'.</p>'
-       +'<p class="small">We\'ve placed a short hold and will contact you shortly to confirm and take payment. Nothing is charged yet. '
-       +'Questions? <a href="mailto:orders@grovecorp.org" style="color:var(--accent)">orders@grovecorp.org</a></p>'
+       +'<p class="small">We\'ve placed a short hold and will contact you shortly to confirm and take payment. Nothing is charged yet. '+'</p>'
        +'<button class="btn btn-ghost btn-block" onclick="closeBooking()" style="margin-top:8px">Done</button></div>'; }
      else { msg.style.color="var(--danger)"; msg.textContent=res.error||"Something went wrong. Please try again."; }
    }).catch(function(){ btn.disabled=false; msg.style.color="var(--danger)"; msg.textContent="Network error — please try again."; });
