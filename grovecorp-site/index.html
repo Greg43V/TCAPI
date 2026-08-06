@@ -239,11 +239,6 @@ footer.dark{background:var(--ink-black);color:rgba(246,244,239,.6);border-top:no
       <div class="eyebrow">Contact us</div>
       <h2>Where do you want to be?</h2>
       <p>Tell us about the event and we'll come back with a package. No obligation.</p>
-      <ul class="meta">
-        <li>Email &mdash; <b>hello@grovecorp.org</b></li>
-        <li>Based in &mdash; <b>USA</b></li>
-        <li>Reg &mdash; <b>Grove Event LLC</b></li>
-      </ul>
       <div class="field"><label class="fl" for="cname">Name</label><input id="cname" autocomplete="name"></div>
       <div class="field"><label class="fl" for="cemail">Email</label><input id="cemail" type="email" autocomplete="email"></div>
       <div class="field"><label class="fl" for="cint">I'm interested in</label>
@@ -262,7 +257,7 @@ footer.dark{background:var(--ink-black);color:rgba(246,244,239,.6);border-top:no
   </section>
 </main>
 
-<footer class="dark"><div class="wrap">&copy; 2026 Grove Event LLC &middot; USA &mdash; Sport &middot; Music &middot; Travel</div></footer>
+<footer class="dark"><div class="wrap">&copy; 2026 Bucket List Exp &middot; USA &mdash; Sport &middot; Music &middot; Travel</div></footer>
 
 <script>
 function sendEnquiry(){
@@ -279,9 +274,9 @@ function sendEnquiry(){
    .then(function(r){return r.json();}).then(function(res){ if(btn) btn.disabled=false;
      if(res.ok){ document.getElementById("cname").value="";document.getElementById("cemail").value="";document.getElementById("cmsg").value="";
        note.style.color="var(--accent)"; note.textContent="Thanks \u2014 your enquiry has been sent. We'll be in touch shortly."; }
-     else { note.style.color="var(--danger)"; note.textContent=res.error||"Something went wrong \u2014 please email hello@grovecorp.org."; }
+     else { note.style.color="var(--danger)"; note.textContent=res.error||"Something went wrong — please try again."; }
    }).catch(function(){ if(btn) btn.disabled=false; note.style.color="var(--danger)";
-     note.textContent="Couldn't send just now \u2014 please email hello@grovecorp.org."; });
+     note.textContent="Couldn't send just now — please try again."; });
 }
 </script>
 </body>
