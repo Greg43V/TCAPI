@@ -183,7 +183,7 @@ var ctrl=new AbortController(), timer=setTimeout(function(){ctrl.abort();},20000
 fetch("/.netlify/functions/tc-fixtures?competition=401",{signal:ctrl.signal})
  .then(function(r){return r.json();})
  .then(function(data){ clearTimeout(timer);
-   if(data && data.warming){ listEl.innerHTML='<div class="state">Prices are updating — this refreshes automatically…</div>'; setTimeout(function(){location.reload();},12000); return; }
+   if(data && data.warming){ listEl.innerHTML='<div class="state">Prices are loading — please refresh in a moment.</div>'; /* auto-reload removed to save usage */ return; }
    ALL=data.fixtures||[];
    if(!ALL.length){ listEl.innerHTML='<div class="state">No upcoming fixtures right now.</div>'; return; }
    render(ALL);
