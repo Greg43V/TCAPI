@@ -216,7 +216,7 @@ if(!eventId){ board.innerHTML='<div class="state">No event specified.</div>'; }
 else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId))
  .then(function(r){return r.json();})
  .then(function(data){
-   if(data && data.warming){ board.innerHTML='<div class="state">Prices are updating…</div>'; setTimeout(function(){location.reload();},12000); return; }
+   if(data && data.warming){ board.innerHTML='<div class="state">Prices are loading — please refresh in a moment.</div>'; /* auto-reload removed to save usage */ return; }
    var p=data.products && data.products[0]; if(!p) throw 0; EV=p;
    document.title=p.name+" — Bucket List Exp";
    document.getElementById("title").textContent=p.name;
