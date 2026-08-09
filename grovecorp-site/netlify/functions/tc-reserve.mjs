@@ -31,7 +31,7 @@ export default async (req) => {
   let body;
   try { body = await req.json(); } catch { return bad("Bad request"); }
 
-  const { ticket_option, quantity, first_name, last_name, email, phone } = body || {};
+  const { ticket_option, quantity, first_name, last_name, email, phone, unit_price, display_total } = body || {};
   const qty = parseInt(quantity, 10);
 
   if (!ticket_option) return bad("Missing ticket option.");
@@ -70,6 +70,10 @@ export default async (req) => {
     const d = resJson.data;
     const expiresAt = d.expires_at ? d.expires_at * 1000 : null;
     const prod = (d.products && d.products[0]) || {};
+    // Customer-facing total = the MARKED-UP price shown on the page (never TC net cost).
+    const sellTotal = Number(display_total) > 0 ? Number(display_total)
+                    : (Number(unit_price) > 0 ? Number(unit_price) * qty : d.price_total);
+    const netTotal = d.price_total;  // our cost (for the agent alert only, never shown to customer)
     const matchName = prod.name || (`Event (option ${ticket_option})`);
     const catName = prod.ticket_option || null;
     const matchDate = prod.tour_date ? new Date(prod.tour_date * 1000).toISOString().slice(0,10) : null;
@@ -80,7 +84,8 @@ export default async (req) => {
         at: Date.now(),
         reservation_num: d.reservation_num,
         expires_at: expiresAt,
-        total: d.price_total,
+        total: sellTotal,
+        net_cost: netTotal,
         currency: d.currency,
         customer: { first_name, last_name, email, phone },
         ticket_option, quantity: qty,
@@ -104,7 +109,7 @@ export default async (req) => {
         (matchDate ? `\u{1F4C5} ${matchDate}\n` : ``) +
         `Category: ${catName || ('option ' + ticket_option)}\n` +
         `Tickets: ${qty}\n` +
-        `Value: ${sym}${d.price_total} ${cur}\n\n` +
+        `Value: ${sym}${sellTotal} ${cur}  (cost ${sym}${netTotal})\n\n` +
         `Ref: ${d.reservation_num}  (expires ${expStr})\n\n` +
         `${first_name} ${last_name}\n` +
         `\u{1F4DE} ${phone}\n` +
@@ -125,7 +130,7 @@ export default async (req) => {
         `<h2>ACTION NEEDED \u2014 seats held ${d.reservation_num}</h2>` +
         `<p><strong>${matchName}</strong>${matchDate ? ' \u2014 ' + matchDate : ''}<br>Category: ${catName || ('option ' + ticket_option)}</p>` +
         `<p><strong>This hold expires ${expStr}.</strong></p>` +
-        `<p><strong>Value:</strong> ${sym}${d.price_total} ${cur}<br>` +
+        `<p><strong>Value:</strong> ${sym}${sellTotal} ${cur} (cost ${sym}${netTotal})<br>` +
         `<strong>Tickets:</strong> ${qty} \u00d7 option ${ticket_option}</p>` +
         `<p><strong>Customer:</strong> ${first_name} ${last_name}<br>Email: ${email}<br>Phone: ${phone}</p>` +
         `<p>No order or invoice has been created \u2014 this is a hold only.</p>`;
@@ -147,7 +152,7 @@ export default async (req) => {
     return new Response(JSON.stringify({
       ok: true,
       reservation_num: d.reservation_num,
-      total: d.price_total,
+      total: sellTotal,
       currency: d.currency,
       expires_at: expiresAt,
     }), { status: 200, headers: { "content-type": "application/json" } });
