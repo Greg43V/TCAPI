@@ -203,7 +203,7 @@ var PL_STANDARD='<div><h3>What\'s included</h3><div class="descbody">'
   +'<li><strong>Official match ticket</strong> in your chosen category — sourced through authorised channels, never the grey market.</li>'
   +'<li><strong>Seat located</strong> in the stadium section shown on the seating plan below.</li>'
   +'<li><strong>Booking handled end to end</strong> by our team — we confirm availability and price with you before anything is paid.</li>'
-  
+  +'<li><strong>Travel add-ons on request</strong> — flights from the USA, hotels near the ground and transfers can be arranged around your match.</li>'
   +'</ul>'
   +'<p style="margin:6px 0 0">Tickets are for the fixture shown. Category names reflect the seating area; final availability is confirmed at booking.</p>'
   +'</div></div>';
@@ -310,7 +310,10 @@ function updateTotal(){ var s=document.getElementById("sheet"); var q=parseInt(s
   s.querySelector(".bm-total").textContent=money(s.dataset.cur,q*parseFloat(s.dataset.unit||0)); }
 function submitBooking(){
   var s=document.getElementById("sheet"), msg=s.querySelector(".bm-msg"), btn=s.querySelector(".bm-submit");
-  var data={ ticket_option:parseInt(s.dataset.opt,10), quantity:parseInt(s.querySelector("#bm-qty").value,10),
+  var qn=parseInt(s.querySelector("#bm-qty").value,10)||1;
+  var unit=parseFloat(s.dataset.unit||0);
+  var data={ ticket_option:parseInt(s.dataset.opt,10), quantity:qn,
+    unit_price:unit, display_total:unit*qn,
     first_name:s.querySelector("#bm-fn").value, last_name:s.querySelector("#bm-ln").value,
     email:s.querySelector("#bm-email").value, phone:s.querySelector("#bm-phone").value };
   if(!s.querySelector("#bm-agree").checked){ msg.style.color="var(--danger)"; msg.textContent="Please tick the box to continue."; return; }
