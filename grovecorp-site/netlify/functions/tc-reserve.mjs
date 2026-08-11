@@ -31,7 +31,7 @@ export default async (req) => {
   let body;
   try { body = await req.json(); } catch { return bad("Bad request"); }
 
-  const { ticket_option, quantity, first_name, last_name, email, phone, unit_price, display_total } = body || {};
+  const { ticket_option, quantity, first_name, last_name, email, phone, unit_price, display_total, display_currency } = body || {};
   const qty = parseInt(quantity, 10);
 
   if (!ticket_option) return bad("Missing ticket option.");
@@ -86,6 +86,7 @@ export default async (req) => {
         expires_at: expiresAt,
         total: sellTotal,
         net_cost: netTotal,
+        display_currency: display_currency || null,
         currency: d.currency,
         customer: { first_name, last_name, email, phone },
         ticket_option, quantity: qty,
@@ -109,7 +110,7 @@ export default async (req) => {
         (matchDate ? `\u{1F4C5} ${matchDate}\n` : ``) +
         `Category: ${catName || ('option ' + ticket_option)}\n` +
         `Tickets: ${qty}\n` +
-        `Value: ${sym}${sellTotal} ${cur}  (cost ${sym}${netTotal})\n\n` +
+        `Value: ${display_currency==='USD'?'$':sym}${sellTotal} ${display_currency||cur}  (cost ${sym}${netTotal} ${cur})\n\n` +
         `Ref: ${d.reservation_num}  (expires ${expStr})\n\n` +
         `${first_name} ${last_name}\n` +
         `\u{1F4DE} ${phone}\n` +
