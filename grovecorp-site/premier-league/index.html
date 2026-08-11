@@ -144,16 +144,32 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 
   <div class="searchbar">
     <input id="search" type="search" placeholder="Search a club — Arsenal, Liverpool…" aria-label="Search fixtures">
-    <div class="count" id="count"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:8px">
+      <div class="count" id="count"></div>
+      <div id="ccyToggle" style="display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden">
+        <button type="button" data-c="USD" onclick="setCcy('USD')" style="min-height:36px;padding:0 12px;border:none;font:inherit;font-weight:600;cursor:pointer">USD</button>
+        <button type="button" data-c="GBP" onclick="setCcy('GBP')" style="min-height:36px;padding:0 12px;border:none;border-left:1px solid var(--line);font:inherit;font-weight:600;cursor:pointer">Local</button>
+      </div>
+    </div>
   </div>
 
   <div id="list" class="rows"><div class="state">Loading fixtures…</div></div>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Bucket List Exp LLC &middot; Official tickets only</div></footer>
+<footer><div class="wrap" style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between"><span>&copy; 2026 Bucket List Exp &middot; Official tickets only</span><span style="display:inline-flex;gap:8px;align-items:center;vertical-align:middle;margin-left:4px"><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Visa" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><text x="19" y="16" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#1A1F71">VISA</text></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Mastercard" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><circle cx="16" cy="12" r="6" fill="#EB001B"/><circle cx="22" cy="12" r="6" fill="#F79E1B" fill-opacity="0.9"/></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="American Express" role="img"><rect width="38" height="24" rx="3" fill="#006FCF"/><text x="19" y="15" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="7" fill="#fff">AMEX</text></svg></span></div><div style="font-size:13px;color:var(--muted)">Contact: <a href="tel:+15614549845" style="color:inherit;font-weight:600">+1 (561) 454-9845</a> &middot; <a href="mailto:info@elitefootytours.com" style="color:inherit;font-weight:600">info@elitefootytours.com</a></div></div></footer>
 
 <script>
 var listEl=document.getElementById("list"), countEl=document.getElementById("count"), searchEl=document.getElementById("search"), ALL=[];
+var FX={ GBP:1.4, EUR:1.15, USD:1, ZAR:0.055, AUD:0.66 }; // fixed rates -> USD
+var DISPLAY = localStorage.getItem("blx_ccy")||"USD";
+function toUSD(a,cur){ return a*(FX[cur||"GBP"]||1); }
+function fmt(a,cur){
+  if(DISPLAY==="USD"){ return "$"+Math.ceil(toUSD(a,cur)).toLocaleString("en-US"); }
+  var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur||"GBP"]||((cur||"")+" ");
+  return s+Number(a).toLocaleString("en-GB");
+}
+function setCcy(c){ DISPLAY=c; try{localStorage.setItem("blx_ccy",c);}catch(e){} applySearch(); syncToggle(); }
+function syncToggle(){ var t=document.getElementById("ccyToggle"); if(t) t.querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed", b.dataset.c===DISPLAY?"true":"false"); b.style.background=b.dataset.c===DISPLAY?"var(--accent)":"transparent"; b.style.color=b.dataset.c===DISPLAY?"#fff":"var(--ink)"; }); }
 function money(a,cur){ var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur||"GBP"]||((cur||"")+" "); return s+Number(a).toLocaleString("en-GB"); }
 function dparts(iso){ var d=new Date(iso);
   return { d:d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"}),
@@ -166,7 +182,7 @@ function render(rows){
     var p=dparts(f.date);
     if(p.m!==lastM){ h+='<div class="groupline">'+p.m+'</div>'; lastM=p.m; }
     var right = f.sold_out ? '<span class="chip chip-out">Sold out</span>'
-      : (f.from ? '<span class="price"><span class="lbl">From</span>'+money(f.from,f.currency)+'</span>'
+      : (f.from ? '<span class="price"><span class="lbl">From</span>'+fmt(f.from,f.currency)+'</span>'
                 : '<span class="chip">See options</span>');
     h+='<a class="row" href="/event/?event='+f.id+'">'
       +'<div class="row-top"><span class="row-date">'+p.d+' &middot; '+p.t+'</span></div>'
