@@ -166,6 +166,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
     <p class="lede" id="meta"></p>
   </section>
 
+  <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
+    <div id="ccyToggle" style="display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden">
+      <button type="button" data-c="USD" onclick="setCcy('USD')" style="min-height:36px;padding:0 12px;border:none;font:inherit;font-weight:600;cursor:pointer">USD</button>
+      <button type="button" data-c="GBP" onclick="setCcy('GBP')" style="min-height:36px;padding:0 12px;border:none;border-left:1px solid var(--line);font:inherit;font-weight:600;cursor:pointer">Local</button>
+    </div>
+  </div>
   <div id="board"><div class="state">Fetching live prices…</div></div>
 
   <div id="mapwrap"></div>
@@ -173,7 +179,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
   <p class="small" id="note" hidden style="margin-top:18px">Prices are live from our supplier, per ticket, package inclusive. Availability and price are confirmed when we contact you. Official tickets only.</p>
 </main>
 
-<footer><div class="wrap">&copy; 2026 Bucket List Exp</div></footer>
+<footer><div class="wrap" style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between"><span>&copy; 2026 Bucket List Exp &middot; Official tickets only</span><span style="display:inline-flex;gap:8px;align-items:center;vertical-align:middle;margin-left:4px"><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Visa" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><text x="19" y="16" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#1A1F71">VISA</text></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Mastercard" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><circle cx="16" cy="12" r="6" fill="#EB001B"/><circle cx="22" cy="12" r="6" fill="#F79E1B" fill-opacity="0.9"/></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="American Express" role="img"><rect width="38" height="24" rx="3" fill="#006FCF"/><text x="19" y="15" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="7" fill="#fff">AMEX</text></svg></span></div><div style="font-size:13px;color:var(--muted)">Contact: <a href="tel:+15614549845" style="color:inherit;font-weight:600">+1 (561) 454-9845</a> &middot; <a href="mailto:info@elitefootytours.com" style="color:inherit;font-weight:600">info@elitefootytours.com</a></div></div></footer>
 
 <!-- booking sheet -->
 <div class="sheet-bg" id="sheetBg" onclick="closeBooking()"></div>
@@ -198,12 +204,21 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 
 <script>
 var EV=null;
+var FX={ GBP:1.4, EUR:1.15, USD:1, ZAR:0.055, AUD:0.66 };
+var DISPLAY = localStorage.getItem("blx_ccy")||"USD";
+function toUSD(a,cur){ return a*(FX[cur||"GBP"]||1); }
+function setCcy(c){ DISPLAY=c; try{localStorage.setItem("blx_ccy",c);}catch(e){} location.reload(); }
+function syncToggle(){ var t=document.getElementById("ccyToggle"); if(t) t.querySelectorAll("button").forEach(function(b){ b.style.background=b.dataset.c===DISPLAY?"var(--accent)":"transparent"; b.style.color=b.dataset.c===DISPLAY?"#fff":"var(--ink)"; }); }
+function fmtc(a,cur){
+  if(DISPLAY==="USD"){ return "$"+Math.ceil(toUSD(a,cur)).toLocaleString("en-US"); }
+  var s={GBP:"\u00a3",EUR:"\u20ac",USD:"$",ZAR:"R",AUD:"A$"}[cur||"GBP"]||((cur||"")+" ");
+  return s+Number(a).toLocaleString("en-GB");
+}
 var PL_STANDARD='<div><h3>What\'s included</h3><div class="descbody">'
   +'<ul>'
   +'<li><strong>Official match ticket</strong> in your chosen category — sourced through authorised channels, never the grey market.</li>'
   +'<li><strong>Seat located</strong> in the stadium section shown on the seating plan below.</li>'
   +'<li><strong>Booking handled end to end</strong> by our team — we confirm availability and price with you before anything is paid.</li>'
-  +'<li><strong>Travel add-ons on request</strong> — flights from the USA, hotels near the ground and transfers can be arranged around your match.</li>'
   +'</ul>'
   +'<p style="margin:6px 0 0">Tickets are for the fixture shown. Category names reflect the seating area; final availability is confirmed at booking.</p>'
   +'</div></div>';
@@ -231,12 +246,12 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
        return '<div class="opt"><div><div class="oname">'+o.name+'</div>'
          +'<div class="oqty">Up to '+o.max_qty+' tickets</div></div>'
          +'<div style="display:flex;align-items:center;gap:14px">'
-         +'<div class="oprice">'+money(p.currency,o.price)+'</div>'
+         +'<div class="oprice">'+fmtc(o.price,p.currency)+'</div>'
          +'<button class="btn btn-primary" style="min-height:40px;padding:0 14px;font-size:14px" onclick="openBooking('+i+')">Request</button>'
          +'</div></div>';
      }).join("");
      board.innerHTML='<div class="card"><div class="eyebrow">Seating &amp; packages</div>'
-       +'<h3 style="margin:6px 0 6px">From '+money(p.currency,p.from)+' per ticket</h3>'+rows+'</div>';
+       +'<h3 style="margin:6px 0 6px">From '+fmtc(p.from,p.currency)+' per ticket</h3>'+rows+'</div>';
      document.getElementById("note").hidden=false;
    }
 
@@ -307,13 +322,14 @@ function openBooking(i){
 }
 function closeBooking(){ document.getElementById("sheet").classList.remove("open"); document.getElementById("sheetBg").classList.remove("open"); }
 function updateTotal(){ var s=document.getElementById("sheet"); var q=parseInt(s.querySelector("#bm-qty").value,10)||1;
-  s.querySelector(".bm-total").textContent=money(s.dataset.cur,q*parseFloat(s.dataset.unit||0)); }
+  s.querySelector(".bm-total").textContent=fmtc(q*parseFloat(s.dataset.unit||0,s.dataset.cur)); }
 function submitBooking(){
   var s=document.getElementById("sheet"), msg=s.querySelector(".bm-msg"), btn=s.querySelector(".bm-submit");
   var qn=parseInt(s.querySelector("#bm-qty").value,10)||1;
   var unit=parseFloat(s.dataset.unit||0);
+  var dispUnit = DISPLAY==="USD" ? Math.ceil(toUSD(unit, s.dataset.cur)) : unit;
   var data={ ticket_option:parseInt(s.dataset.opt,10), quantity:qn,
-    unit_price:unit, display_total:unit*qn,
+    unit_price:dispUnit, display_total:dispUnit*qn, display_currency:(DISPLAY==='USD'?'USD':s.dataset.cur),
     first_name:s.querySelector("#bm-fn").value, last_name:s.querySelector("#bm-ln").value,
     email:s.querySelector("#bm-email").value, phone:s.querySelector("#bm-phone").value };
   if(!s.querySelector("#bm-agree").checked){ msg.style.color="var(--danger)"; msg.textContent="Please tick the box to continue."; return; }
@@ -322,7 +338,7 @@ function submitBooking(){
    .then(function(r){return r.json();}).then(function(res){ btn.disabled=false;
      if(res.ok){ s.querySelector(".bm-body").innerHTML='<div style="text-align:center;padding:8px 0">'
        +'<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:8px">Seats requested &check;</div>'
-       +'<p>Reference <strong>'+res.reservation_num+'</strong> — '+money(res.currency,res.total)+'.</p>'
+       +'<p>Reference <strong>'+res.reservation_num+'</strong> — '+fmtc(res.total,res.currency)+'.</p>'
        +'<p class="small">We\'ve placed a short hold and will contact you shortly to confirm and take payment. Nothing is charged yet. '+'</p>'
        +'<button class="btn btn-ghost btn-block" onclick="closeBooking()" style="margin-top:8px">Done</button></div>'; }
      else { msg.style.color="var(--danger)"; msg.textContent=res.error||"Something went wrong. Please try again."; }
