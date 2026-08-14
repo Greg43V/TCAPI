@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <title>South Africa v New Zealand — 22 Aug 2026, Ellis Park — Bucket List Exp</title>
-<meta name="description" content="Springboks v All Blacks, First Test, 22 August 2026 at Ellis Park. Premium pitchside seats in Block W5 behind the players' benches. Best seats in the house."/>
+<meta name="description" content="Springboks v All Blacks, First Test, 22 August 2026 at Ellis Park. Grandstand from R800 or premium pitchside seats in Block W5. Best seats in the house."/>
 <style>
 :root{
   --paper:#F6F4EF; --card:#FFFFFF; --ink:#0E1826; --ink-2:#3B4657;
@@ -179,6 +179,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
     <li>&#127945; <b>First Test</b> &middot; Freedom Cup</li>
   </ul>
 
+  <h2 style="margin:18px 0 4px">Choose your seats</h2>
+  <p class="small" style="margin-bottom:6px">Two options for this Test, both sold as any split.</p>
+
+  <div class="pricebox" style="border-top-color:var(--blue)">
+    <div class="tag">Grandstand</div>
+    <h3 style="margin:2px 0 8px">Grandstand seats</h3>
+    <p class="small">A great-value way into the biggest Test of the year. Good groupings available, sold as any split.</p>
+    <div class="total"><span>Price per ticket</span><b>R800</b></div>
+    <button class="btn btn-blue btn-block" onclick="openBooking('grand')">Request Grandstand seats</button>
+  </div>
+
   <div class="pricebox">
     <div class="tag" style="background:var(--accent-soft);color:var(--accent-dk)">Best seats in the house</div>
     <h2 style="margin:2px 0 10px">Block W5 &mdash; behind the players' benches</h2>
@@ -190,7 +201,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
     </div>
     <p class="small">20 seats total in Block W5. Available as 10 + 4 + 6, or any combination that suits your group.</p>
     <div class="total"><span>Price per ticket</span><b>R5,750</b></div>
-    <button class="btn btn-primary btn-block" onclick="openBooking()">Request these seats</button>
+    <button class="btn btn-primary btn-block" onclick="openBooking('pitch')">Request pitchside seats</button>
     <p class="small" style="margin-top:10px">We place a short hold and contact you to confirm. Nothing is charged yet.</p>
   </div>
 
@@ -221,21 +232,27 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
 </div>
 
 <script>
-var PRICE=5750, MAXQ=20;
+var TIERS={
+  grand:{ name:"Grandstand", price:800, max:20, label:"SA v NZ 22 Aug Ellis Park - Grandstand" },
+  pitch:{ name:"Block W5 pitchside", price:5750, max:20, label:"SA v NZ 22 Aug Ellis Park - Block W5 pitchside" }
+};
+var CUR=null;
 function money(a){ return "R"+Number(a).toLocaleString("en-ZA"); }
-function openBooking(){
-  var q=""; for(var k=1;k<=MAXQ;k++) q+='<option value="'+k+'">'+k+'</option>';
+function openBooking(tier){
+  CUR=TIERS[tier]||TIERS.pitch;
+  document.querySelector("#sheet h3").textContent=CUR.name+" - R"+CUR.price.toLocaleString("en-ZA")+"/ticket";
+  var q=""; for(var k=1;k<=CUR.max;k++) q+='<option value="'+k+'">'+k+'</option>';
   document.getElementById("bm-qty").innerHTML=q;
   document.querySelector(".bm-msg").textContent=""; updateTotal();
   document.getElementById("sheetBg").classList.add("open"); document.getElementById("sheet").classList.add("open");
 }
 function closeBooking(){ document.getElementById("sheet").classList.remove("open"); document.getElementById("sheetBg").classList.remove("open"); }
-function updateTotal(){ var q=parseInt(document.getElementById("bm-qty").value,10)||1; document.querySelector(".bm-total").textContent=money(q*PRICE); }
+function updateTotal(){ var q=parseInt(document.getElementById("bm-qty").value,10)||1; document.querySelector(".bm-total").textContent=money(q*(CUR?CUR.price:0)); }
 function submitBooking(){
   var msg=document.querySelector(".bm-msg"), btn=document.querySelector(".bm-submit");
   var q=parseInt(document.getElementById("bm-qty").value,10)||1;
-  var data={ event_label:"SA v NZ — 22 Aug 2026 — Ellis Park — Block W5 (pitchside)",
-    manual:true, quantity:q, unit_price:PRICE, display_total:q*PRICE, display_currency:"ZAR",
+  var data={ event_label:(CUR?CUR.label:"SA v NZ"),
+    manual:true, quantity:q, unit_price:(CUR?CUR.price:0), display_total:q*(CUR?CUR.price:0), display_currency:"ZAR",
     first_name:document.getElementById("bm-fn").value, last_name:document.getElementById("bm-ln").value,
     email:document.getElementById("bm-email").value, phone:document.getElementById("bm-phone").value,
     note:document.getElementById("bm-note").value };
@@ -243,8 +260,8 @@ function submitBooking(){
   msg.style.color="var(--muted)"; msg.textContent="Sending your request…"; btn.disabled=true;
   fetch("/.netlify/functions/enquiry",{method:"POST",headers:{"content-type":"application/json"},
     body:JSON.stringify({name:data.first_name+" "+data.last_name, email:data.email,
-      interest:"SA v NZ (22 Aug, Ellis Park) — Block W5 pitchside",
-      message:"SEAT REQUEST\nQty: "+q+" @ R5,750 = "+money(q*PRICE)+"\nPhone: "+data.phone+"\nNote: "+data.note})})
+      interest:(CUR?CUR.label:"SA v NZ 22 Aug Ellis Park"),
+      message:"SEAT REQUEST\n"+(CUR?CUR.name:"")+"\nQty: "+q+" @ R"+(CUR?CUR.price.toLocaleString("en-ZA"):"")+" = "+money(q*(CUR?CUR.price:0))+"\nPhone: "+data.phone+"\nNote: "+data.note})})
    .then(function(r){return r.json();}).then(function(res){ btn.disabled=false;
      if(res.ok){ document.querySelector(".bm-body").innerHTML='<div style="text-align:center;padding:8px 0">'
        +'<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:8px">Request received &check;</div>'
