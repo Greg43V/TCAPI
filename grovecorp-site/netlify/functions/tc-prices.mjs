@@ -5,6 +5,12 @@
 import { getStore } from "@netlify/blobs";
 
 const BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
+const MARGIN_PCT = parseFloat(process.env.TC_MARGIN_PCT || "0");
+const ROUND_TO = parseFloat(process.env.TC_ROUND_TO || "1");
+const MARGIN_OVERRIDES = (process.env.TC_MARGIN_OVERRIDES || "").split(",").map((x)=>x.split("=")).filter((kv)=>kv.length===2&&kv[0].trim()).map(([k,v])=>[k.trim().toLowerCase(),parseFloat(v)]).filter(([,v])=>!isNaN(v));
+function marginFor(name){ const n=(name||"").toLowerCase(); for(const [k,pct] of MARGIN_OVERRIDES) if(n.includes(k)) return pct; return MARGIN_PCT; }
+function applyMargin(cost,name){ const step=ROUND_TO>0?ROUND_TO:1; return Math.ceil((cost*(1+marginFor(name)/100))/step)*step; }
+function startIso(m){ var st=m&&m.start; if(!st) return null; if(typeof st==="string") return st; return st.utc||st.local||null; }
 let _tok = null, _tokExp = 0;
 async function token() {
   if (_tok && Date.now() < _tokExp) return _tok;
@@ -45,11 +51,33 @@ async function detailFor(id, store) {
     const d = (await r.json()).data || {};
     const venue = await venueById(d.venue, t, store);
     const sp = d.seating_plan || {};
+    // live prices for this product (so non-PL events show name + options too)
+    let liveOptions = [];
+    try {
+      const ir = await fetch(`${BASE}/inventory-status`, {
+        method: "POST", headers: { authorization: `Bearer ${t}`, accept: "application/json", "content-type": "application/json" },
+        body: JSON.stringify({ products: [id], page: { number: 1 } }),
+      });
+      if (ir.ok) {
+        const ij = await ir.json();
+        const row = (ij.data || []).find((x) => x.id === id) || (ij.data || [])[0];
+        if (row && Array.isArray(row.ticket_options)) {
+          liveOptions = row.ticket_options.filter((o) => o.available).map((o) => ({
+            name: o.name, price: applyMargin(o.price, d.name), max_qty: o.max_purchase_qty,
+            ticket_option: o.id, ticket_category: o.ticket_category,
+          })).sort((a, b) => a.price - b.price);
+        }
+      }
+    } catch (_) {}
     const data = {
       description: { information: d.information || null, notes: d.notes || null, timetable: d.timetable || null },
       venue,
       seating_image: sp.image || (venue && venue.seating) || null,
       category_map: Array.isArray(sp.category_map) ? sp.category_map : null,
+      name: d.name || null,
+      date: startIso(d.match) || null,
+      currency: d.currency || "GBP",
+      options: liveOptions,
     };
     try { await store.setJSON("detail-" + id, { at: Date.now(), data }); } catch (_) {}
     return data;
@@ -73,9 +101,9 @@ export default async (req) => {
   try { prices = await store.get("prices", { type: "json" }); } catch (_) {}
   try { venues = await store.get("venues", { type: "json" }); } catch (_) {}
 
-  if (!products || !prices) {
-    return new Response(JSON.stringify({ warming: true, products: [] }), { status: 200, headers });
-  }
+  // products/prices may be null for non-PL events; that's fine — detailFor fetches live.
+  products = products || { list: [] };
+  prices = prices || { by_id: {}, ts: null };
 
   const meta = {};
   for (const p of products.list) meta[p.id] = p;
@@ -87,18 +115,23 @@ export default async (req) => {
       .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option, ticket_category: c.ticket_category }))
       .sort((a, b) => a.price - b.price);
     const detail = await detailFor(id, store);
+    // Prefer poller cache (PL); fall back to live detail (any other competition).
+    const options = cats.length ? cats : ((detail && detail.options) || []);
+    const name = m.name || (detail && detail.name) || `Event ${id}`;
+    const date = m.date || (detail && detail.date) || null;
+    const currency = m.currency || (detail && detail.currency) || "GBP";
     return {
       id,
       venue: (detail && detail.venue) || null,
       seating_image: (detail && detail.seating_image) || null,
       category_map: (detail && detail.category_map) || null,
       description: (detail && detail.description) || null,
-      name: m.name || `Event ${id}`,
-      date: m.date || null,
-      currency: m.currency || "GBP",
-      sold_out: cats.length === 0,
-      from: cats.length ? cats[0].price : null,
-      options: cats,
+      name,
+      date,
+      currency,
+      sold_out: options.length === 0,
+      from: options.length ? options[0].price : null,
+      options,
     };
   }));
 
