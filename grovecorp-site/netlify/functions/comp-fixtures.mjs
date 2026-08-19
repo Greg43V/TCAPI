@@ -27,6 +27,15 @@ function applyMargin(cost, name) {
 }
 const COMPETITION_CURRENCY = { 401:"GBP",405:"EUR",406:"EUR",407:"EUR",408:"EUR",409:"EUR",410:"EUR",412:"EUR",426:"EUR",433:"EUR",434:"EUR",440:"EUR",442:"EUR",443:"EUR" };
 function currencyFor(c){ return COMPETITION_CURRENCY[c] || "GBP"; }
+function startMs(p){
+  var m = p.match && p.match.start;
+  if (!m) { if (p.event_dates && p.event_dates[0]) return new Date(p.event_dates[0]).getTime(); return 0; }
+  if (typeof m === "string") return new Date(m).getTime();
+  if (m.epoch) return m.epoch * 1000;
+  if (m.utc) return new Date(m.utc).getTime();
+  if (m.local) return new Date(m.local).getTime();
+  return 0;
+}
 
 async function token() {
   const r = await fetch(`${BASE}/oauthorize/token`, {
@@ -77,10 +86,7 @@ export default async (req) => {
 
     const now = Date.now();
     // upcoming only
-    const upcoming = products.filter((p) => {
-      const start = p.match?.start ? new Date(p.match.start).getTime() : (p.event_dates?.[0] ? new Date(p.event_dates[0]).getTime() : 0);
-      return start > now;
-    });
+    const upcoming = products.filter((p) => startMs(p) > now);
 
     // price them (batch through inventory-status, 10 at a time)
     const priceById = {};
@@ -110,7 +116,7 @@ export default async (req) => {
     }
 
     const fixtures = upcoming.map((p) => {
-      const start = p.match?.start || p.event_dates?.[0] || null;
+      const start = (p.match && p.match.start) ? (p.match.start.utc || p.match.start.local) : (p.event_dates && p.event_dates[0]) || null;
       const from = priceById[p.id];
       return {
         id: p.id, name: p.name, date: start, currency: cur,
