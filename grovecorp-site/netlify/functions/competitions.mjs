@@ -41,7 +41,10 @@ export default async (req) => {
       try {
         const d = await tcGet(`/product?competition=${comp.id}&page[number]=1`, t);
         has = (d.data || []).some((p) => {
-          const start = p.match?.start ? new Date(p.match.start).getTime() : (p.event_dates?.[0] ? new Date(p.event_dates[0]).getTime() : 0);
+          const m = p.match && p.match.start;
+          let start = 0;
+          if (m) start = m.epoch ? m.epoch*1000 : (m.utc ? new Date(m.utc).getTime() : (m.local ? new Date(m.local).getTime() : 0));
+          else if (p.event_dates && p.event_dates[0]) start = new Date(p.event_dates[0]).getTime();
           return start > now;
         });
       } catch (_) {}
