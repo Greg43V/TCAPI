@@ -13,7 +13,7 @@ export default async (req)=>{
     L("meta: "+JSON.stringify(d.meta||{}));
     L("count on page 1: "+((d.data||[]).length));
     (d.data||[]).slice(0,6).forEach(p=>{
-      L("  id="+p.id+" | name="+p.name+" | match.start="+(p.match&&p.match.start)+" | event_dates="+JSON.stringify(p.event_dates));
+      L("  id="+p.id+" | "+p.name+" | match="+JSON.stringify(p.match));
     });
   }catch(e){ L("ERR "+String(e&&e.message||e)); }
   return new Response(out.join("\n"),{headers:{"content-type":"text/plain"}});
