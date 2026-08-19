@@ -38,12 +38,14 @@ async function venueById(vid, t, store) {
     return data;
   } catch (_) { return null; }
 }
-async function detailFor(id, store) {
-  // cache the whole detail bundle (description + venue) for 6h
-  try {
-    const c = await store.get("detail-" + id, { type: "json" });
-    if (c && Date.now() - c.at < 6 * 3600 * 1000) return c.data;
-  } catch (_) {}
+async function detailFor(id, store, bypass) {
+  // cache the whole detail bundle (description + venue + name + options) for 6h
+  if (!bypass) {
+    try {
+      const c = await store.get("detail-" + id, { type: "json" });
+      if (c && Date.now() - c.at < 6 * 3600 * 1000 && c.data && c.data.name !== undefined) return c.data;
+    } catch (_) {}
+  }
   try {
     const t = await token();
     const r = await fetch(`${BASE}/product/${id}`, { headers: { authorization: `Bearer ${t}`, accept: "application/json" } });
@@ -87,6 +89,7 @@ async function detailFor(id, store) {
 
 export default async (req) => {
   const url = new URL(req.url);
+  const bypass = url.searchParams.get("fresh") === "1";
   const ids = (url.searchParams.get("products") || "")
     .split(",").map((s) => parseInt(s.trim(), 10)).filter(Boolean);
   const headers = { "content-type": "application/json", "cache-control": "public, max-age=60" };
@@ -114,7 +117,7 @@ export default async (req) => {
     const cats = (byId[id] || []).filter((c) => c.available)
       .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option, ticket_category: c.ticket_category }))
       .sort((a, b) => a.price - b.price);
-    const detail = await detailFor(id, store);
+    const detail = await detailFor(id, store, bypass);
     // Prefer poller cache (PL); fall back to live detail (any other competition).
     const options = cats.length ? cats : ((detail && detail.options) || []);
     const name = m.name || (detail && detail.name) || `Event ${id}`;
