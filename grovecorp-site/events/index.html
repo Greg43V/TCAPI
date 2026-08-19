@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#F6F4EF"/>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>All Competitions — Bucket List Exp</title>
+<meta name="description" content="Official tickets across football competitions."/>
+<style>
+:root{
+  --paper:#F6F4EF; --card:#FFFFFF; --ink:#0E1826; --ink-2:#3B4657;
+  --muted:#727D8C; --line:#E4E0D7; --line-2:#EEEBE3;
+  --accent:#14655A;        /* teal-green primary */
+  --accent-dk:#0E4A42;
+  --accent-soft:#E7F0EE;
+  --blue:#1E5BD6;          /* blue secondary */
+  --blue-dk:#1848AC;
+  --blue-soft:#E8EFFD;
+  --danger:#C0492B; --danger-soft:#FBEBE6;
+  --r:4px;                 /* sharper */
+  --r-lg:6px;
+  --sans:'Archivo',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+a{color:inherit;text-decoration:none}
+img,iframe{max-width:100%}
+.wrap{max-width:1020px;margin:0 auto;padding:0 18px}
+.narrow{max-width:680px}
+
+/* header */
+header{position:sticky;top:0;z-index:30;background:rgba(246,244,239,.9);
+  backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px}
+.brand{font-weight:800;letter-spacing:-.03em;font-size:17px}
+.brand span{color:var(--accent)}
+.navlink{font-size:14px;font-weight:500;color:var(--muted);padding:10px 2px}
+.navlink:hover{color:var(--ink)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+  padding:0 20px;border-radius:var(--r);font-size:15px;font-weight:600;letter-spacing:-.01em;
+  border:1px solid transparent;cursor:pointer;font-family:inherit;transition:background .14s,border-color .14s,color .14s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-dk)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:var(--blue-dk)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--ink);background:#fff}
+.btn-block{width:100%}
+
+/* type */
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent);font-weight:500}
+.eyebrow.blue{color:var(--blue)}
+h1{font-size:clamp(31px,7.2vw,48px);line-height:1.06;letter-spacing:-.035em;font-weight:800;margin:12px 0 14px}
+h2{font-size:clamp(23px,4.6vw,32px);line-height:1.14;letter-spacing:-.03em;font-weight:800;margin:10px 0 12px}
+h3{font-size:18px;line-height:1.28;letter-spacing:-.02em;font-weight:700;margin:0 0 6px}
+p{margin:0 0 14px;color:var(--ink-2)}
+.lede{font-size:18px;color:var(--ink-2);letter-spacing:-.01em}
+.small{font-size:14px;color:var(--muted)}
+.section{padding:44px 0}
+.section + .section{border-top:1px solid var(--line)}
+@media(min-width:820px){ .section{padding:72px 0} }
+
+/* cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px}
+.grid{display:grid;gap:14px}
+@media(min-width:760px){ .grid-3{grid-template-columns:repeat(3,1fr)} }
+/* accent top-rule for feature cards */
+.card-top{border-top:3px solid var(--accent)}
+.card-top.blue{border-top-color:var(--blue)}
+.card-top.gold{border-top-color:#C58B2E}
+
+/* stats */
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 22px;padding:0;list-style:none}
+.stats li{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);
+  padding:9px 13px;font-size:13px;color:var(--muted)}
+.stats b{display:block;font-family:var(--mono);font-size:16px;color:var(--ink);font-weight:500}
+
+/* fixture rows */
+.rows{margin-top:6px}
+.row{display:block;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--line);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:9px;transition:border-color .14s,transform .07s}
+.row:hover{border-color:var(--line);border-left-color:var(--accent)}
+.row:active{transform:translateY(1px)}
+.row-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.row-date{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+.row-name{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:4px 0 0}
+.row-venue{font-size:13px;color:var(--muted);margin-top:2px}
+.row-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}
+.price{font-family:var(--mono);font-size:17px;font-weight:500}
+.price .lbl{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-family:var(--sans);font-weight:600}
+.go{font-size:14px;font-weight:600;color:var(--blue)}
+.chip{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 8px;border-radius:var(--r);background:var(--accent-soft);color:var(--accent-dk)}
+.chip-blue{background:var(--blue-soft);color:var(--blue-dk)}
+.chip-out{background:var(--danger-soft);color:var(--danger)}
+.groupline{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin:26px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line-2)}
+
+/* forms */
+input,select,textarea{width:100%;min-height:48px;padding:12px 14px;font:inherit;color:var(--ink);
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r)}
+textarea{min-height:110px;resize:vertical}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:transparent}
+label.fl{display:block;font-size:13px;font-weight:600;margin:0 0 6px}
+.field{margin-bottom:14px}
+
+.state{padding:34px 4px;text-align:center;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding:26px 0;color:var(--muted);font-size:14px}
+::selection{background:var(--blue-soft)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.searchbar{position:sticky;top:58px;z-index:20;background:var(--paper);padding:12px 0 10px;border-bottom:1px solid var(--line)}
+.count{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* THEME */
+:root{ --accent:#C8102E; --accent-dk:#9E0C24; --accent-soft:#FBE7EA; } .btn-primary{background:var(--blue)} .btn-primary:hover{background:var(--blue-dk)} .price{color:var(--blue-dk)} .row:hover{border-left-color:var(--blue)} .go{color:var(--accent)} .chip{background:var(--blue-soft);color:var(--blue-dk)} .eyebrow{color:var(--blue)} .herobox::before{background:linear-gradient(var(--blue),var(--accent))} .brand span{color:var(--blue)}
+</style>
+<style>
+.grp{margin:26px 0 8px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line-2);padding-bottom:6px}
+.comp{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--card);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);padding:14px 16px;margin-bottom:9px;transition:border-color .14s}
+.comp:hover{border-left-color:var(--blue)}
+.comp .nm{font-weight:700;letter-spacing:-.01em}
+.comp .go{font-size:14px;font-weight:600;color:var(--blue)}
+.state{padding:34px 4px;text-align:center;color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="/">Bucket List <span>Exp</span></a>
+    <a class="navlink" href="/">&larr; Home</a>
+  </div>
+</header>
+<main class="wrap">
+  <section style="padding:24px 0 4px">
+    <div class="eyebrow">Official tickets</div>
+    <h1>All competitions</h1>
+    <p class="lede narrow">Every competition with tickets on sale right now. Tap one to see fixtures and prices.</p>
+  </section>
+  <div id="list"><div class="state">Loading competitions…</div></div>
+</main>
+<footer><div class="wrap" style="display:flex;flex-direction:column;gap:10px"><div style="display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between"><span>&copy; 2026 Bucket List Exp &middot; Official tickets only</span><span style="display:inline-flex;gap:8px;align-items:center;vertical-align:middle;margin-left:4px"><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Visa" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><text x="19" y="16" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#1A1F71">VISA</text></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="Mastercard" role="img"><rect width="38" height="24" rx="3" fill="#fff" stroke="#e4e0d7"/><circle cx="16" cy="12" r="6" fill="#EB001B"/><circle cx="22" cy="12" r="6" fill="#F79E1B" fill-opacity="0.9"/></svg><svg width="38" height="24" viewBox="0 0 38 24" aria-label="American Express" role="img"><rect width="38" height="24" rx="3" fill="#006FCF"/><text x="19" y="15" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="7" fill="#fff">AMEX</text></svg></span></div><div style="font-size:13px;color:var(--muted)">Contact: <a href="tel:+15614549845" style="color:inherit;font-weight:600">+1 (561) 454-9845</a> &middot; <a href="mailto:info@elitefootytours.com" style="color:inherit;font-weight:600">info@elitefootytours.com</a></div><div style="font-size:13px;color:var(--muted)"><a href="/shipping/" style="color:inherit">Ticket Delivery</a> &middot; <a href="/cancellations/" style="color:inherit">Cancellations</a> &middot; <a href="/refunds/" style="color:inherit">Refunds</a> &middot; <a href="/terms/" style="color:inherit">Terms</a> &middot; <a href="/privacy/" style="color:inherit">Privacy</a></div></div></footer>
+<script>
+var GROUPS=[
+  ["England",[401,402,403,404,415,417,418,419,420,422,425,432,435,439]],
+  ["Europe",[405,406,407,408,409,410,412,424,426,433,434,436,437,440,441,442,443,414,413]],
+  ["Scotland",[431,438]],
+  ["International",[411,416,421,423,428,429,430]],
+  ["Other",[427]]
+];
+var NAMES={"401":"Premier League","402":"Championship","403":"League One","404":"League Two","405":"La Liga","406":"Segunda Division","407":"Ligue 1","408":"Copa del Rey","409":"Champions League","410":"Serie A","411":"NFL","412":"Europa League","413":"International Champions Cup","414":"Gamper Trophy","415":"Community Shield","416":"Euro Qualifier","417":"Carabao Cup Final","418":"FA Cup Semi Final","419":"FA Cup Final","420":"Carabao Cup","421":"International Friendly","422":"FA Cup","423":"World Cup","424":"Conference League","425":"Play Off Final","426":"Bundesliga","427":"Premier Padel P1","428":"Nations League","429":"Womens Finalissima","430":"Six Nations","431":"Scottish Premiership","432":"Womens Super League","433":"Coppa Italia","434":"Coupe de France","435":"Play Off","436":"Liga F","437":"Copa de la Reina","438":"Scottish League Cup","439":"Premier Sports Cup Final","440":"DFB Cup","441":"Womens Champions League","442":"Serie B","443":"Ligue 2"};
+var listEl=document.getElementById("list");
+var ctrl=new AbortController(), timer=setTimeout(function(){ctrl.abort();},25000);
+fetch("/.netlify/functions/competitions",{signal:ctrl.signal})
+ .then(function(r){return r.json();})
+ .then(function(data){ clearTimeout(timer);
+   var comps=data.competitions||[];
+   var have={}; comps.forEach(function(c){ if(c.has_fixtures||c.id===401) have[c.id]=true; });
+   have[401]=true;
+   var html="", any=false;
+   GROUPS.forEach(function(g){
+     var ids=g[1].filter(function(id){ return have[id]; });
+     if(!ids.length) return;
+     any=true;
+     html+='<div class="grp">'+g[0]+'</div>';
+     ids.forEach(function(id){
+       var nm=NAMES[String(id)]||("Competition "+id);
+       html+='<a class="comp" href="/competition/?comp='+id+'"><span class="nm">'+nm+'</span><span class="go">View fixtures &rarr;</span></a>';
+     });
+   });
+   listEl.innerHTML = any ? html : '<div class="state">No competitions have tickets on sale right now. Please check back soon.</div>';
+ })
+ .catch(function(){ clearTimeout(timer);
+   listEl.innerHTML='<div class="state">Couldn\'t load competitions just now. <a href="/premier-league/" style="color:var(--accent)">See Premier League fixtures &rarr;</a></div>'; });
+</script>
+</body>
+</html>
