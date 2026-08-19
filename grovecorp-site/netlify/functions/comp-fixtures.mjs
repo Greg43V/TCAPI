@@ -60,14 +60,17 @@ export default async (req) => {
 
   const store = getStore("tc-cache");
   const cacheKey = "comp-" + competition;
+  const bypass = url.searchParams.get("fresh") === "1";
 
-  // serve cache if fresh
-  try {
-    const c = await store.get(cacheKey, { type:"json" });
-    if (c && Date.now() - c.ts < CACHE_MS) {
-      return new Response(JSON.stringify({ competition, count:c.fixtures.length, fixtures:c.fixtures, cached:true }), { status:200, headers });
-    }
-  } catch (_) {}
+  // serve cache if fresh (unless bypass requested)
+  if (!bypass) {
+    try {
+      const c = await store.get(cacheKey, { type:"json" });
+      if (c && Date.now() - c.ts < CACHE_MS) {
+        return new Response(JSON.stringify({ competition, count:c.fixtures.length, fixtures:c.fixtures, cached:true }), { status:200, headers });
+      }
+    } catch (_) {}
+  }
 
   // fetch fresh from TC
   try {
