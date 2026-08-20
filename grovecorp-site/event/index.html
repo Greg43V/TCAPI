@@ -328,8 +328,9 @@ function submitBooking(){
   var qn=parseInt(s.querySelector("#bm-qty").value,10)||1;
   var unit=parseFloat(s.dataset.unit||0);
   // amount charged = exactly what the customer sees. USD (default) uses the 1.4 rate; Local uses native.
-  var dispUnit = DISPLAY==="USD" ? Math.ceil(toUSD(unit, s.dataset.cur)) : unit;
-  var total = dispUnit*qn;
+  // Sola only processes USD — always charge USD regardless of what the customer is viewing.
+  var usdUnit = Math.ceil(toUSD(unit, s.dataset.cur));
+  var total = usdUnit*qn;
   var fn=s.querySelector("#bm-fn").value.trim(), ln=s.querySelector("#bm-ln").value.trim();
   var email=s.querySelector("#bm-email").value.trim(), phone=s.querySelector("#bm-phone").value.trim();
   if(!fn||!email){ msg.style.color="var(--danger)"; msg.textContent="Please enter your name and email."; return; }
@@ -338,7 +339,7 @@ function submitBooking(){
   var label = (EV && EV.name ? EV.name : "Booking") + " — " + (s.querySelector(".bm-title")?s.querySelector(".bm-title").textContent:"");
   var qs = new URLSearchParams({
     opt: s.dataset.opt, qty: String(qn), amt: String(total),
-    ccy: (DISPLAY==="USD"?"USD":s.dataset.cur),
+    ccy: "USD",
     label: label, fn: fn, ln: ln, email: email, phone: phone
   });
   msg.style.color="var(--muted)"; msg.textContent="Taking you to secure payment…"; btn.disabled=true;
