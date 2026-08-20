@@ -77,7 +77,7 @@ export default async (req) => {
     xName: (card_name || `${first_name} ${last_name || ""}`).trim(),
     xEmail: email,
     xInvoice: invoice,
-    xCurrency: (currency || "USD"),
+    xCurrency: "USD",  // Sola account only supports USD; charge is always USD
   };
   if (!TEST_MODE) { solaReq.xAmount = amt.toFixed(2); } // amount only matters for a real sale
 
