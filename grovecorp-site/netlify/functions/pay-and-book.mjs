@@ -48,7 +48,7 @@ export default async (req) => {
     amount,              // charge amount (USD) — what the customer agreed to
     ticket_option,       // TC ticket_option id
     quantity,            // number of tickets
-    first_name, last_name, email, phone,
+    first_name, last_name, email, phone, exp, card_name,
     event_label,         // human label for alerts
   } = body || {};
 
@@ -72,8 +72,9 @@ export default async (req) => {
     xCommand: command,
     xCardNum: sut,               // SUT from iFields (card number)
     xCVV: cvv_token || "",       // SUT from iFields (cvv)
+    xExp: (exp || "").replace(/[^0-9]/g, "").slice(0,4),  // MMYY
     xCardType: "",               // gateway infers
-    xName: `${first_name} ${last_name || ""}`.trim(),
+    xName: (card_name || `${first_name} ${last_name || ""}`).trim(),
     xEmail: email,
     xInvoice: invoice,
     xCurrency: "USD",
