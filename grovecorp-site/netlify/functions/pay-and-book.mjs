@@ -15,6 +15,7 @@
 const SOLA_URL = "https://x1.cardknox.com/gatewayJSON";
 const TC_BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
 const TEST_MODE = (process.env.SOLA_TEST_MODE ?? "1") === "1"; // default SAFE (no charge)
+const SKIP_TC = (process.env.SOLA_SKIP_TC ?? "0") === "1"; // when "1", do NOT create a TC order (pure payment test)
 
 function tg(text) {
   const tok = process.env.TELEGRAM_BOT_TOKEN, chat = process.env.TELEGRAM_CHAT_ID;
@@ -95,6 +96,12 @@ export default async (req) => {
     // payment failed — NO TC order is created
     await tg(`❌ PAYMENT FAILED\n${event_label || ""}\n${first_name} ${last_name || ""}\n${sola.xError || sola.xStatus || "declined"} (ref ${sola.xRefNum || "n/a"})`);
     return new Response(JSON.stringify({ ok: false, stage: "payment", error: sola.xError || "Your card was declined. Please try another card." }), { status: 200, headers: H });
+  }
+
+  // ---- payment-only test: stop here, do NOT create a TC order ----
+  if (SKIP_TC) {
+    await tg(`${TEST_MODE ? "🧪 TEST (no charge)" : "✅ PAID"} — PAYMENT-ONLY (no TC order)\n${event_label || ""}\n${first_name} ${last_name || ""}\nSola ${sola.xStatus} (ref ${sola.xRefNum})`);
+    return new Response(JSON.stringify({ ok: true, test_mode: TEST_MODE, skip_tc: true, order_no: "(payment test — no booking)", payment_ref: sola.xRefNum, sola_status: sola.xStatus }), { status: 200, headers: H });
   }
 
   // ---- 2) PAYMENT OK -> create the TC order (reserve then confirm) ----
