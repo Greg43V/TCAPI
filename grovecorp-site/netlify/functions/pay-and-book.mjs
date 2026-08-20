@@ -43,6 +43,7 @@ export default async (req) => {
 
   const {
     sut,                 // single-use token from iFields (card)
+    cvv_token,           // single-use token from iFields (cvv)
     amount,              // charge amount (USD) — what the customer agreed to
     ticket_option,       // TC ticket_option id
     quantity,            // number of tickets
@@ -68,7 +69,8 @@ export default async (req) => {
     xKey, xVersion: "5.0.0",
     xSoftwareName: "BucketListExp", xSoftwareVersion: "1.0",
     xCommand: command,
-    xToken: sut,                 // single-use token from iFields
+    xCardNum: sut,               // SUT from iFields (card number)
+    xCVV: cvv_token || "",       // SUT from iFields (cvv)
     xCardType: "",               // gateway infers
     xName: `${first_name} ${last_name || ""}`.trim(),
     xEmail: email,
