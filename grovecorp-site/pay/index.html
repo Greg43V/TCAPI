@@ -222,7 +222,7 @@ var Q=new URLSearchParams(location.search);
 var BOOK={
   opt:parseInt(Q.get("opt"),10), qty:parseInt(Q.get("qty")||"1",10),
   amt:parseFloat(Q.get("amt")||"0"), label:Q.get("label")||"Your booking",
-  fn:Q.get("fn")||"", ln:Q.get("ln")||"", email:Q.get("email")||"", phone:Q.get("phone")||"", ccy:(Q.get("ccy")||"USD")
+  fn:Q.get("fn")||"", ln:Q.get("ln")||"", email:Q.get("email")||"", phone:Q.get("phone")||"", ccy:"USD"
 };
 function money(n){ var sym={USD:"$",GBP:"\u00a3",EUR:"\u20ac",ZAR:"R",AUD:"A$"}[BOOK.ccy]||"$"; return sym+Number(n).toLocaleString("en-US"); }
 document.getElementById("sumLabel").textContent=BOOK.label;
