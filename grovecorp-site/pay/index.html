@@ -222,9 +222,9 @@ var Q=new URLSearchParams(location.search);
 var BOOK={
   opt:parseInt(Q.get("opt"),10), qty:parseInt(Q.get("qty")||"1",10),
   amt:parseFloat(Q.get("amt")||"0"), label:Q.get("label")||"Your booking",
-  fn:Q.get("fn")||"", ln:Q.get("ln")||"", email:Q.get("email")||"", phone:Q.get("phone")||""
+  fn:Q.get("fn")||"", ln:Q.get("ln")||"", email:Q.get("email")||"", phone:Q.get("phone")||"", ccy:(Q.get("ccy")||"USD")
 };
-function money(n){ return "$"+Number(n).toLocaleString("en-US"); }
+function money(n){ var sym={USD:"$",GBP:"\u00a3",EUR:"\u20ac",ZAR:"R",AUD:"A$"}[BOOK.ccy]||"$"; return sym+Number(n).toLocaleString("en-US"); }
 document.getElementById("sumLabel").textContent=BOOK.label;
 document.getElementById("sumQty").textContent=BOOK.qty+" ticket"+(BOOK.qty>1?"s":"");
 document.getElementById("sumEach").textContent=BOOK.qty>1?(money(BOOK.amt/BOOK.qty)+" each"):"";
@@ -262,7 +262,7 @@ document.getElementById("payForm").addEventListener("submit", function(ev){
     fetch("/.netlify/functions/pay-and-book", {
       method:"POST", headers:{"content-type":"application/json"},
       body: JSON.stringify({
-        sut: sut, cvv_token: cvvTok, amount: BOOK.amt, ticket_option: BOOK.opt, quantity: BOOK.qty,
+        sut: sut, cvv_token: cvvTok, amount: BOOK.amt, currency: BOOK.ccy, ticket_option: BOOK.opt, quantity: BOOK.qty,
         first_name: BOOK.fn, last_name: BOOK.ln, email: BOOK.email, phone: BOOK.phone,
         exp: exp, card_name: name, event_label: BOOK.label
       })
