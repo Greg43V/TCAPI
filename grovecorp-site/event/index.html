@@ -196,9 +196,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offse
     <div class="field"><input id="bm-email" type="email" placeholder="Email" autocomplete="email"></div>
     <div class="field"><input id="bm-phone" type="tel" placeholder="Contact phone" autocomplete="tel"></div>
     <label class="agree"><input id="bm-agree" type="checkbox">
-      <span>I'd like Bucket List Exp to <strong>hold these seats</strong> and contact me to complete the booking. Official tickets only.</span></label>
+      <span>I agree to the <a href="/terms/" target="_blank" style="color:var(--accent)">Terms</a>, <a href="/refunds/" target="_blank" style="color:var(--accent)">Refunds</a> policy (all sales final), and confirm my details are correct. Official tickets only.</span></label>
     <p class="bm-msg"></p>
-    <button class="btn btn-primary btn-block bm-submit" onclick="submitBooking()">Request these seats</button>
+    <button class="btn btn-primary btn-block bm-submit" onclick="submitBooking()">Continue to secure payment &rarr;</button>
   </div>
 </div>
 
@@ -327,22 +327,22 @@ function submitBooking(){
   var s=document.getElementById("sheet"), msg=s.querySelector(".bm-msg"), btn=s.querySelector(".bm-submit");
   var qn=parseInt(s.querySelector("#bm-qty").value,10)||1;
   var unit=parseFloat(s.dataset.unit||0);
+  // amount charged = exactly what the customer sees. USD (default) uses the 1.4 rate; Local uses native.
   var dispUnit = DISPLAY==="USD" ? Math.ceil(toUSD(unit, s.dataset.cur)) : unit;
-  var data={ ticket_option:parseInt(s.dataset.opt,10), quantity:qn,
-    unit_price:dispUnit, display_total:dispUnit*qn, display_currency:(DISPLAY==='USD'?'USD':s.dataset.cur),
-    first_name:s.querySelector("#bm-fn").value, last_name:s.querySelector("#bm-ln").value,
-    email:s.querySelector("#bm-email").value, phone:s.querySelector("#bm-phone").value };
+  var total = dispUnit*qn;
+  var fn=s.querySelector("#bm-fn").value.trim(), ln=s.querySelector("#bm-ln").value.trim();
+  var email=s.querySelector("#bm-email").value.trim(), phone=s.querySelector("#bm-phone").value.trim();
+  if(!fn||!email){ msg.style.color="var(--danger)"; msg.textContent="Please enter your name and email."; return; }
   if(!s.querySelector("#bm-agree").checked){ msg.style.color="var(--danger)"; msg.textContent="Please tick the box to continue."; return; }
-  msg.style.color="var(--muted)"; msg.textContent="Holding your seats…"; btn.disabled=true;
-  fetch("/.netlify/functions/tc-reserve",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(data)})
-   .then(function(r){return r.json();}).then(function(res){ btn.disabled=false;
-     if(res.ok){ s.querySelector(".bm-body").innerHTML='<div style="text-align:center;padding:8px 0">'
-       +'<div style="font-size:20px;font-weight:700;color:var(--accent);margin-bottom:8px">Seats requested &check;</div>'
-       +'<p>Reference <strong>'+res.reservation_num+'</strong> — '+fmtc(res.total,res.currency)+'.</p>'
-       +'<p class="small">We\'ve placed a short hold and will contact you shortly to confirm and take payment. Nothing is charged yet. '+'</p>'
-       +'<button class="btn btn-ghost btn-block" onclick="closeBooking()" style="margin-top:8px">Done</button></div>'; }
-     else { msg.style.color="var(--danger)"; msg.textContent=res.error||"Something went wrong. Please try again."; }
-   }).catch(function(){ btn.disabled=false; msg.style.color="var(--danger)"; msg.textContent="Network error — please try again."; });
+  // Build the secure payment URL and go there. Charge currency: USD if displaying USD, else native.
+  var label = (EV && EV.name ? EV.name : "Booking") + " — " + (s.querySelector(".bm-title")?s.querySelector(".bm-title").textContent:"");
+  var qs = new URLSearchParams({
+    opt: s.dataset.opt, qty: String(qn), amt: String(total),
+    ccy: (DISPLAY==="USD"?"USD":s.dataset.cur),
+    label: label, fn: fn, ln: ln, email: email, phone: phone
+  });
+  msg.style.color="var(--muted)"; msg.textContent="Taking you to secure payment…"; btn.disabled=true;
+  window.location.href = "/pay/?" + qs.toString();
 }
 </script>
 </body>
