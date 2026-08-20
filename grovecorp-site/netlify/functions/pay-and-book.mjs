@@ -48,7 +48,7 @@ export default async (req) => {
     amount,              // charge amount (USD) — what the customer agreed to
     ticket_option,       // TC ticket_option id
     quantity,            // number of tickets
-    first_name, last_name, email, phone, exp, card_name,
+    first_name, last_name, email, phone, exp, card_name, currency,
     event_label,         // human label for alerts
   } = body || {};
 
@@ -77,7 +77,7 @@ export default async (req) => {
     xName: (card_name || `${first_name} ${last_name || ""}`).trim(),
     xEmail: email,
     xInvoice: invoice,
-    xCurrency: "USD",
+    xCurrency: (currency || "USD"),
   };
   if (!TEST_MODE) { solaReq.xAmount = amt.toFixed(2); } // amount only matters for a real sale
 
