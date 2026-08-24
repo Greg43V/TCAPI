@@ -95,13 +95,13 @@ export default async (req) => {
   const approved = sola.xResult === "A";
   if (!approved) {
     // payment failed — NO TC order is created
-    await tg(`❌ PAYMENT FAILED\n${event_label || ""}\n${first_name} ${last_name || ""}\n${sola.xError || sola.xStatus || "declined"} (ref ${sola.xRefNum || "n/a"})`);
+    await tg(`❌ PAYMENT FAILED\n${event_label || ""}\n${first_name} ${last_name || ""}\n📧 ${email}\n${sola.xError || sola.xStatus || "declined"} (ref ${sola.xRefNum || "n/a"})`);
     return new Response(JSON.stringify({ ok: false, stage: "payment", error: sola.xError || "Your card was declined. Please try another card." }), { status: 200, headers: H });
   }
 
   // ---- payment-only test: stop here, do NOT create a TC order ----
   if (SKIP_TC) {
-    await tg(`${TEST_MODE ? "🧪 TEST (no charge)" : "✅ PAID"} — PAYMENT-ONLY (no TC order)\n${event_label || ""}\n${first_name} ${last_name || ""}\nSola ${sola.xStatus} (ref ${sola.xRefNum})`);
+    await tg(`${TEST_MODE ? "🧪 TEST (no charge)" : "✅ PAID"} — PAYMENT-ONLY (no TC order)\n${event_label || ""}\n${first_name} ${last_name || ""}\n📧 ${email}\n📞 ${phone || "—"}\nSola ${sola.xStatus} (ref ${sola.xRefNum})`);
     return new Response(JSON.stringify({ ok: true, test_mode: TEST_MODE, skip_tc: true, order_no: "(payment test — no booking)", payment_ref: sola.xRefNum, sola_status: sola.xStatus }), { status: 200, headers: H });
   }
 
@@ -137,7 +137,9 @@ export default async (req) => {
   if (tcOrder) {
     await tg(
       `${TEST_MODE ? "🧪 TEST (no charge)" : "✅ PAID"} + ORDER\n` +
-      `${event_label || ""}\n${first_name} ${last_name || ""} — ${quantity} ticket(s)\n` +
+      `${event_label || ""}\n` +
+      `${first_name} ${last_name || ""} — ${quantity} ticket(s)\n` +
+      `📧 ${email}\n📞 ${phone || "—"}\n` +
       `Charge: ${TEST_MODE ? "£0 (cc:save)" : "$" + amt.toFixed(2)} (ref ${sola.xRefNum})\n` +
       `TC order: ${tcOrder.order_no || tcOrder.order_num || holdNum}`
     );
@@ -147,6 +149,7 @@ export default async (req) => {
     await tg(
       `⚠️ ${TEST_MODE ? "TEST: " : ""}PAID BUT TC ORDER FAILED — ACTION NEEDED\n` +
       `${event_label || ""}\n${first_name} ${last_name || ""} — ${quantity} ticket(s)\n` +
+      `📧 ${email}\n📞 ${phone || "—"}\n` +
       `Payment ref ${sola.xRefNum} (${TEST_MODE ? "no real charge" : "$" + amt.toFixed(2) + " CHARGED"})\n` +
       `Hold: ${holdNum || "none"}\nError: ${tcErr}`
     );
