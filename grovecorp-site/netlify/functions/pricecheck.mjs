@@ -48,5 +48,29 @@ export default async (req) => {
     }
   } catch(e) { out.live_inventory_error = String(e&&e.message||e); }
 
+  // Replicate detailFor's EXACT option build to see if it returns options or empty
+  try {
+    const pid = parseInt(new URL(req.url).searchParams.get("product") || "0", 10);
+    if (pid) {
+      const BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
+      const tr = await fetch(`${BASE}/oauthorize/token`, { method:"POST", headers:{ "content-type":"application/json", accept:"application/json" }, body: JSON.stringify({ grant_type:"password", username:process.env.TC_USERNAME, password:process.env.TC_PASSWORD }) });
+      const tok = (await tr.json()).access_token;
+      // fetch product detail like detailFor does
+      const pr = await fetch(`${BASE}/product/${pid}`, { headers:{ authorization:`Bearer ${tok}`, accept:"application/json" } });
+      const d = (await pr.json()).data || {};
+      const ir = await fetch(`${BASE}/inventory-status`, { method:"POST", headers:{ authorization:`Bearer ${tok}`, accept:"application/json", "content-type":"application/json" }, body: JSON.stringify({ products:[pid], page:{ number:1 } }) });
+      const ij = await ir.json();
+      const row = (ij.data||[]).find(x=>x.id===pid) || (ij.data||[])[0];
+      out.detailFor_probe = {
+        product_name: d.name,
+        row_found: !!row,
+        raw_options_count: row && row.ticket_options ? row.ticket_options.length : 0,
+        available_count: row && row.ticket_options ? row.ticket_options.filter(o=>o.available).length : 0,
+        sample_option_fields: row && row.ticket_options && row.ticket_options[0] ? Object.keys(row.ticket_options[0]) : [],
+        first_opt: row && row.ticket_options && row.ticket_options[0] ? { name:row.ticket_options[0].name, price:row.ticket_options[0].price, available:row.ticket_options[0].available, id:row.ticket_options[0].id } : null
+      };
+    }
+  } catch(e) { out.detailFor_probe_error = String(e&&e.message||e); }
+
   return new Response(JSON.stringify(out, null, 2), { headers: { "content-type": "application/json" } });
 };
