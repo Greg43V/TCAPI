@@ -54,7 +54,7 @@ async function tcGet(path, t) {
 export default async (req) => {
   const url = new URL(req.url);
   const competition = parseInt(url.searchParams.get("competition") || "0", 10);
-  const headers = { "content-type":"application/json", "cache-control":"public, max-age=120" };
+  const headers = { "content-type":"application/json", "cache-control":"no-store, no-cache, must-revalidate, max-age=0" };
   if (!competition) return new Response(JSON.stringify({ error:"missing competition" }), { status:400, headers });
   if (competition === 401) return new Response(JSON.stringify({ error:"use tc-fixtures for 401" }), { status:400, headers });
 
