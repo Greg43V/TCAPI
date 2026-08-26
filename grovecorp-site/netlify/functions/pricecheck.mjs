@@ -3,7 +3,7 @@
 import { getStore } from "@netlify/blobs";
 export default async (req) => {
   const out = {};
-  out.deployed_marker = "fresh-bypass-v2"; // proves whether the latest code is live
+  out.deployed_marker = "DEPLOY-TEST-v3"; // proves whether the latest code is live
   out.env = {
     TC_MARGIN_PCT: process.env.TC_MARGIN_PCT ?? "(unset)",
     TC_ROUND_TO: process.env.TC_ROUND_TO ?? "(unset)",
