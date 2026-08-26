@@ -118,8 +118,12 @@ export default async (req) => {
       .map((c) => ({ name: c.name, price: c.price, max_qty: c.max_qty, ticket_option: c.ticket_option, ticket_category: c.ticket_category }))
       .sort((a, b) => a.price - b.price);
     const detail = await detailFor(id, store, bypass);
-    // Prefer poller cache (PL); fall back to live detail (any other competition).
-    const options = cats.length ? cats : ((detail && detail.options) || []);
+    // Normally prefer poller cache (PL) and fall back to live detail (other comps).
+    // With ?fresh=1, IGNORE the poller cache and use freshly-priced live options,
+    // so margin/override changes show immediately instead of waiting for the poller.
+    const options = bypass
+      ? ((detail && detail.options && detail.options.length) ? detail.options : cats)
+      : (cats.length ? cats : ((detail && detail.options) || []));
     const name = m.name || (detail && detail.name) || `Event ${id}`;
     const date = m.date || (detail && detail.date) || null;
     const currency = m.currency || (detail && detail.currency) || "GBP";
