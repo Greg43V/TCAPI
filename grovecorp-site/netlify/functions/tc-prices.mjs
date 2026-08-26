@@ -92,7 +92,7 @@ export default async (req) => {
   const bypass = url.searchParams.get("fresh") === "1";
   const ids = (url.searchParams.get("products") || "")
     .split(",").map((s) => parseInt(s.trim(), 10)).filter(Boolean);
-  const headers = { "content-type": "application/json", "cache-control": "public, max-age=60" };
+  const headers = { "content-type": "application/json", "cache-control": "no-store, no-cache, must-revalidate, max-age=0" };
 
   if (!ids.length) {
     return new Response(JSON.stringify({ error: "No product IDs. Use ?products=18793" }), { status: 400, headers });
