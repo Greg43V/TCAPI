@@ -247,17 +247,22 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 
 var msg=document.getElementById("msg"), btn=document.getElementById("payBtn");
-function fail(t){ msg.style.color="var(--danger)"; msg.textContent=t; btn.disabled=false; }
+function fail(t){ msg.style.color="var(--danger)"; msg.textContent=t; btn.disabled=false; SUBMITTING=false; }
 function info(t){ msg.style.color="var(--muted)"; msg.textContent=t; }
 
+var SUBMITTING=false;
 document.getElementById("payForm").addEventListener("submit", function(ev){
   ev.preventDefault();
+  if(SUBMITTING) return;
   if(!BOOK.opt || !BOOK.amt){ fail("Missing booking details — please go back and try again."); return; }
   var name=document.getElementById("cardName").value.trim();
   var exp=document.getElementById("cardExp").value.replace(/[^0-9]/g,"");
   if(!name){ fail("Enter the cardholder name."); return; }
   if(exp.length!==4){ fail("Enter expiry as MM/YY."); return; }
-  btn.disabled=true; info("Securing your card…");
+  btn.disabled=true; SUBMITTING=true; info("Securing your card…");
+  // clear any previously-generated (possibly spent) tokens so we always submit a FRESH one
+  var _cn=document.querySelector('[data-ifields-id="card-number-token"]'); if(_cn) _cn.value="";
+  var _cv=document.querySelector('[data-ifields-id="cvv-token"]'); if(_cv) _cv.value="";
 
   // getTokens fills the hidden SUT fields, then we charge server-side
   getTokens(function(){
