@@ -9,7 +9,7 @@ import { getStore } from "@netlify/blobs";
 const BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
 const MARGIN_PCT = parseFloat(process.env.TC_MARGIN_PCT || "0");
 const ROUND_TO = parseFloat(process.env.TC_ROUND_TO || "1");
-const CACHE_MS = 30 * 60 * 1000; // 30 min, matches the poller cadence
+const CACHE_MS = 5 * 60 * 1000; // 5 min — short, so stale prices can't linger (was 30 min)
 
 const MARGIN_OVERRIDES = (process.env.TC_MARGIN_OVERRIDES || "")
   .split(",").map((p) => p.split("="))
@@ -122,7 +122,7 @@ export default async (req) => {
       const start = (p.match && p.match.start) ? (p.match.start.utc || p.match.start.local) : (p.event_dates && p.event_dates[0]) || null;
       const from = priceById[p.id];
       return {
-        id: p.id, name: p.name, date: start, currency: cur,
+        id: p.id, name: p.name, date: start, currency: (p.currency || cur),
         from: (from === undefined ? null : from),
         sold_out: from === null,
         priced: from !== undefined,
