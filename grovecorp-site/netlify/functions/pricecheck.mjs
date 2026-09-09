@@ -72,5 +72,23 @@ export default async (req) => {
     }
   } catch(e) { out.detailFor_probe_error = String(e&&e.message||e); }
 
+  // Probe: does /product LIST carry a per-item currency? (?complist=409)
+  try {
+    const comp = parseInt(new URL(req.url).searchParams.get("complist") || "0", 10);
+    if (comp) {
+      const BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
+      const tr = await fetch(`${BASE}/oauthorize/token`, { method:"POST", headers:{ "content-type":"application/json", accept:"application/json" }, body: JSON.stringify({ grant_type:"password", username:process.env.TC_USERNAME, password:process.env.TC_PASSWORD }) });
+      const tok = (await tr.json()).access_token;
+      const pr = await fetch(`${BASE}/product?competition=${comp}&page[number]=1`, { headers:{ authorization:`Bearer ${tok}`, accept:"application/json" } });
+      const pj = await pr.json();
+      const list = pj.data || [];
+      out.product_list_probe = {
+        count: list.length,
+        has_currency_field: list[0] ? ("currency" in list[0]) : false,
+        samples: list.slice(0,6).map(x => ({ name: x.name, currency: x.currency, top_keys: Object.keys(x).slice(0,12) }))
+      };
+    }
+  } catch(e) { out.product_list_probe_error = String(e&&e.message||e); }
+
   return new Response(JSON.stringify(out, null, 2), { headers: { "content-type": "application/json" } });
 };
