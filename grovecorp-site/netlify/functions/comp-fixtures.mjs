@@ -91,10 +91,7 @@ export default async (req) => {
     // upcoming only
     const upcoming = products.filter((p) => startMs(p) > now);
 
-    // Currency per fixture: prefer what inventory-status returns; fall back to UK-venue => GBP,
-    // else the competition default. This makes UK-hosted UCL games show GBP and others EUR.
-    const UK_VENUES = new Set([1003, 1006]); // known: Emirates, Anfield
-    // English clubs — when they are the HOME team (name before " v "), the match is in England => GBP.
+    // Per-fixture currency: English club at HOME => GBP (match is in England); else competition default (EUR).
     const ENGLISH_CLUBS = ["arsenal","chelsea","liverpool","manchester","man ","tottenham","spurs","aston villa","newcastle","west ham","everton","brighton","crystal palace","fulham","brentford","wolves","wolverhampton","nottingham","bournemouth","leicester","leeds","burnley","sheffield","southampton","ipswich","luton","norwich","watford","sunderland"];
     const isEnglishHome = (name) => { const home = String(name||"").split(/\s+v\s+/i)[0].toLowerCase(); return ENGLISH_CLUBS.some(c => home.includes(c)); };
     const currencyById = {};
@@ -114,8 +111,7 @@ export default async (req) => {
         const d = await r.json();
         for (const p of d.data || []) {
           const opts = (p.ticket_options || []).filter((o) => o.available);
-          // capture currency from the inventory row / first option if TC provides it
-          const invCur = p.currency || (opts[0] && opts[0].currency) || (p.ticket_options && p.ticket_options[0] && p.ticket_options[0].currency);
+          const invCur = p.currency || (opts[0] && opts[0].currency);
           if (invCur) currencyById[p.id] = invCur;
           if (opts.length) {
             const min = Math.min(...opts.map((o) => applyMargin(o.price, nameOf(upcoming, p.id))));
@@ -129,13 +125,11 @@ export default async (req) => {
       }
     }
 
-    const venueOf = (p) => (typeof p.venue === "number" ? p.venue : (p.venue && p.venue.id));
     const fixtures = upcoming.map((p) => {
       const start = (p.match && p.match.start) ? (p.match.start.utc || p.match.start.local) : (p.event_dates && p.event_dates[0]) || null;
       const from = priceById[p.id];
-      const fixCur = currencyById[p.id] || (isEnglishHome(p.name) ? "GBP" : (UK_VENUES.has(venueOf(p)) ? "GBP" : cur));
       return {
-        id: p.id, name: p.name, date: start, currency: fixCur,
+        id: p.id, name: p.name, date: start, currency: (currencyById[p.id] || (isEnglishHome(p.name) ? "GBP" : cur)),
         from: (from === undefined ? null : from),
         sold_out: from === null,
         priced: from !== undefined,
