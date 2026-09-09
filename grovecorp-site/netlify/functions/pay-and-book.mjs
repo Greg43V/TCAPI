@@ -26,6 +26,41 @@ function tg(text) {
   }).catch(() => {});
 }
 
+async function sendBuyerEmail({ to, name, eventLabel, qty, amount, orderNo }) {
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !to) return;
+  const from = process.env.EMAIL_FROM || "Bucket List Exp <onboarding@resend.dev>";
+  const replyTo = process.env.EMAIL_REPLYTO || "info@elitefootytours.com";
+  const money = "$" + Number(amount).toFixed(2);
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#1a1a1a">
+    <div style="background:#111;color:#fff;padding:20px 24px;border-radius:10px 10px 0 0">
+      <h1 style="margin:0;font-size:20px">Bucket List Exp</h1>
+    </div>
+    <div style="border:1px solid #e5e5e5;border-top:none;padding:24px;border-radius:0 0 10px 10px">
+      <p style="font-size:16px;margin:0 0 14px">Hi ${name || "there"},</p>
+      <p style="margin:0 0 14px">Thanks for your order — your payment was received and your booking is confirmed.</p>
+      <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:15px">
+        <tr><td style="padding:6px 0;color:#666">Event</td><td style="padding:6px 0;text-align:right;font-weight:600">${eventLabel || ""}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Tickets</td><td style="padding:6px 0;text-align:right;font-weight:600">${qty}</td></tr>
+        <tr><td style="padding:6px 0;color:#666">Total paid</td><td style="padding:6px 0;text-align:right;font-weight:600">${money}</td></tr>
+        ${orderNo ? `<tr><td style="padding:6px 0;color:#666">Order reference</td><td style="padding:6px 0;text-align:right;font-weight:600">${orderNo}</td></tr>` : ""}
+      </table>
+      <p style="margin:14px 0;padding:12px;background:#f6f6f4;border-radius:8px;font-size:14px">Your tickets will be delivered by email no later than <strong>24 hours before the match</strong>.</p>
+      <p style="font-size:14px;color:#666;margin:14px 0 0">Questions? Reply to this email or contact ${replyTo} / +1 (561) 454-9845.</p>
+    </div>
+    <p style="text-align:center;color:#999;font-size:12px;margin:16px 0">Bucket List Exp · Official tickets</p>
+  </div>`;
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { "authorization": `Bearer ${key}`, "content-type": "application/json" },
+      body: JSON.stringify({ from, to: [to], reply_to: replyTo,
+        subject: `Booking confirmed — ${eventLabel || "your tickets"}${orderNo ? " (" + orderNo + ")" : ""}`, html }),
+    });
+  } catch (_) {}
+}
+
 async function tcToken() {
   const r = await fetch(`${TC_BASE}/oauthorize/token`, {
     method: "POST", headers: { "content-type": "application/json", accept: "application/json" },
@@ -143,6 +178,8 @@ export default async (req) => {
       `Charge: ${TEST_MODE ? "£0 (cc:save)" : "$" + amt.toFixed(2)} (ref ${sola.xRefNum})\n` +
       `TC order: ${tcOrder.order_no || tcOrder.order_num || holdNum}`
     );
+    // send the buyer their confirmation email (best-effort; never blocks the response)
+    await sendBuyerEmail({ to: email, name: first_name, eventLabel: event_label, qty: quantity, amount: amt, orderNo: (tcOrder.order_no || tcOrder.order_num || holdNum) });
     return new Response(JSON.stringify({ ok: true, test_mode: TEST_MODE, order_no: tcOrder.order_no || tcOrder.order_num || holdNum, payment_ref: sola.xRefNum }), { status: 200, headers: H });
   } else {
     // PAYMENT SUCCEEDED BUT TC FAILED — needs manual resolution (refund or manual confirm)
