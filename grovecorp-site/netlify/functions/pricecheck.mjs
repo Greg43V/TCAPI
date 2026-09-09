@@ -85,9 +85,20 @@ export default async (req) => {
       out.product_list_probe = {
         count: list.length,
         has_currency_field: list[0] ? ("currency" in list[0]) : false,
-        samples: list.slice(0,6).map(x => ({ name: x.name, currency: x.currency, top_keys: Object.keys(x).slice(0,12) }))
+        samples: list.slice(0,6).map(x => ({ name: x.name, venue: x.venue })),
+        inventory_currency_sample: null
       };
     }
+      // does inventory-status carry currency?
+      try {
+        const first = list[0];
+        if (first) {
+          const ir = await fetch(`${BASE}/inventory-status`, { method:"POST", headers:{ authorization:`Bearer ${tok}`, accept:"application/json", "content-type":"application/json" }, body: JSON.stringify({ products:[first.id], page:{ number:1 } }) });
+          const ij = await ir.json();
+          const row = (ij.data||[])[0];
+          out.inventory_currency = { product: first.name, row_keys: row?Object.keys(row):[], currency: row?row.currency:null, opt0: row&&row.ticket_options&&row.ticket_options[0]?{name:row.ticket_options[0].name,price:row.ticket_options[0].price,currency:row.ticket_options[0].currency}:null };
+        }
+      } catch(ee) { out.inventory_currency_error = String(ee&&ee.message||ee); }
   } catch(e) { out.product_list_probe_error = String(e&&e.message||e); }
 
   return new Response(JSON.stringify(out, null, 2), { headers: { "content-type": "application/json" } });
