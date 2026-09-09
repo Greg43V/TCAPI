@@ -89,17 +89,21 @@ export default async (req) => {
         inventory_currency_sample: null
       };
     }
-      // does inventory-status carry currency?
-      try {
-        const first = list[0];
-        if (first) {
-          const ir = await fetch(`${BASE}/inventory-status`, { method:"POST", headers:{ authorization:`Bearer ${tok}`, accept:"application/json", "content-type":"application/json" }, body: JSON.stringify({ products:[first.id], page:{ number:1 } }) });
-          const ij = await ir.json();
-          const row = (ij.data||[])[0];
-          out.inventory_currency = { product: first.name, row_keys: row?Object.keys(row):[], currency: row?row.currency:null, opt0: row&&row.ticket_options&&row.ticket_options[0]?{name:row.ticket_options[0].name,price:row.ticket_options[0].price,currency:row.ticket_options[0].currency}:null };
-        }
-      } catch(ee) { out.inventory_currency_error = String(ee&&ee.message||ee); }
   } catch(e) { out.product_list_probe_error = String(e&&e.message||e); }
+
+  // Standalone inventory currency probe: ?inv=<productId>
+  try {
+    const invId = parseInt(new URL(req.url).searchParams.get("inv") || "0", 10);
+    if (invId) {
+      const BASE = process.env.TC_BASE || "https://api-sandbox.travelconnectionleisure.com/v1";
+      const tr = await fetch(`${BASE}/oauthorize/token`, { method:"POST", headers:{ "content-type":"application/json", accept:"application/json" }, body: JSON.stringify({ grant_type:"password", username:process.env.TC_USERNAME, password:process.env.TC_PASSWORD }) });
+      const tok = (await tr.json()).access_token;
+      const ir = await fetch(`${BASE}/inventory-status`, { method:"POST", headers:{ authorization:`Bearer ${tok}`, accept:"application/json", "content-type":"application/json" }, body: JSON.stringify({ products:[invId], page:{ number:1 } }) });
+      const ij = await ir.json();
+      const row = (ij.data||[])[0];
+      out.inventory_probe = { product_id: invId, row_keys: row?Object.keys(row):[], row_currency: row?row.currency:null, opt0: row&&row.ticket_options&&row.ticket_options[0]? row.ticket_options[0] : null };
+    }
+  } catch(e) { out.inventory_probe_error = String(e&&e.message||e); }
 
   return new Response(JSON.stringify(out, null, 2), { headers: { "content-type": "application/json" } });
 };
