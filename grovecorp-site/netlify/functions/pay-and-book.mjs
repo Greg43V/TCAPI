@@ -28,7 +28,8 @@ function tg(text) {
 
 async function sendBuyerEmail({ to, name, eventLabel, qty, amount, orderNo }) {
   const key = process.env.RESEND_API_KEY;
-  if (!key || !to) return;
+  if (!key) { await tg("\u26a0\ufe0f No RESEND_API_KEY set \u2014 buyer got NO confirmation email."); return { ok:false, error:"no key" }; }
+  if (!to) return { ok:false, error:"no recipient" };
   const from = process.env.EMAIL_FROM || "Bucket List Exp <onboarding@resend.dev>";
   const replyTo = process.env.EMAIL_REPLYTO || "info@elitefootytours.com";
   const money = "$" + Number(amount).toFixed(2);
@@ -52,13 +53,22 @@ async function sendBuyerEmail({ to, name, eventLabel, qty, amount, orderNo }) {
     <p style="text-align:center;color:#999;font-size:12px;margin:16px 0">Bucket List Exp · Official tickets</p>
   </div>`;
   try {
-    await fetch("https://api.resend.com/emails", {
+    const r = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { "authorization": `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({ from, to: [to], reply_to: replyTo,
         subject: `Booking confirmed — ${eventLabel || "your tickets"}${orderNo ? " (" + orderNo + ")" : ""}`, html }),
     });
-  } catch (_) {}
+    const rb = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      await tg(`\u26a0\ufe0f CONFIRMATION EMAIL FAILED\nto: ${to}\nfrom: ${from}\nResend ${r.status}: ${(rb && (rb.message || rb.name)) || JSON.stringify(rb).slice(0,200)}`);
+      return { ok: false, error: (rb && rb.message) || ("status " + r.status) };
+    }
+    return { ok: true, id: rb.id };
+  } catch (e) {
+    await tg(`\u26a0\ufe0f CONFIRMATION EMAIL ERROR\nto: ${to}\n${String(e && e.message || e)}`);
+    return { ok: false, error: String(e && e.message || e) };
+  }
 }
 
 async function tcToken() {
