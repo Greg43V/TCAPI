@@ -162,17 +162,31 @@ async function refreshProducts(store, token) {
 }
 
 // Refresh prices for the known product list — the per-minute job.
+// Resilient: a failed batch/page is skipped, not fatal, so a partial result
+// still gets written. Previously one bad inventory call threw and the whole
+// prices blob was never written (froze since Aug 7).
 async function refreshPrices(store, products) {
   const token = await tokenFetch(store);
   const ids = products.map((p) => p.id);
   const nameById = {};
   for (const p of products) nameById[p.id] = p.name;
-  const priced = {}; // id -> [{name, price, max_qty, available}]
+
+  // start from the existing prices so a partial run only updates what it can reach
+  let priced = {};
+  try { const prev = await store.get("prices", { type: "json" }); if (prev && prev.by_id) priced = prev.by_id; } catch (_) {}
+
+  let batches = 0, errors = 0;
   for (let i = 0; i < ids.length; i += 100) {
     const batch = ids.slice(i, i + 100);
     let page = 1;
     for (;;) {
-      const d = await tcPost("/inventory-status", token, { products: batch, page: { number: page } });
+      let d;
+      try {
+        d = await tcPost("/inventory-status", token, { products: batch, page: { number: page } });
+      } catch (e) {
+        errors++;
+        break; // skip the rest of this batch's pages, move on — don't kill the whole run
+      }
       for (const p of d.data || []) {
         priced[p.id] = (p.ticket_options || []).map((o) => ({
           name: o.name,
@@ -184,16 +198,20 @@ async function refreshPrices(store, products) {
           ticket_category: o.ticket_category,
         }));
       }
+      batches++;
       if (page >= (d.meta?.last_page || 1) || (d.data || []).length === 0) break;
       page += 1;
     }
   }
-  await store.setJSON("prices", { ts: Date.now(), by_id: priced });
+  // Always write what we have — even a partial refresh beats a frozen blob.
+  await store.setJSON("prices", { ts: Date.now(), by_id: priced, batches, errors });
 }
 
-export default async () => {
+export default async (req) => {
   if (!MARGIN_PCT) return new Response("TC_MARGIN_PCT not set", { status: 500 });
   const store = getStore("tc-cache");
+  let forcePrices = false;
+  try { forcePrices = new URL(req.url).searchParams.get("prices") === "1"; } catch (_) {}
   try {
     const token = await tokenFetch(store);
 
@@ -201,6 +219,13 @@ export default async () => {
     let productsMeta = null;
     try { productsMeta = await store.get("products", { type: "json" }); } catch (_) {}
     const productsStale = !productsMeta || Date.now() - productsMeta.ts > PRODUCT_SEARCH_INTERVAL_MS;
+
+    // Manual trigger: /tc-poll?prices=1 forces a price refresh (needs a product list).
+    if (forcePrices && productsMeta && productsMeta.list) {
+      await refreshPrices(store, productsMeta.list);
+      const pr = await store.get("prices", { type: "json" }).catch(() => null);
+      return new Response(JSON.stringify({ ok:true, forced:true, prices_ts: pr && pr.ts, count: pr && pr.by_id ? Object.keys(pr.by_id).length : 0, batches: pr && pr.batches, errors: pr && pr.errors }), { status: 200, headers:{ "content-type":"application/json" } });
+    }
 
     if (productsStale) {
       // Hourly job: refresh the product list. Skip prices this minute to stay well under the limit.
