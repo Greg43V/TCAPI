@@ -182,8 +182,7 @@ function render(rows){
     var p=dparts(f.date);
     if(p.m!==lastM){ h+='<div class="groupline">'+p.m+'</div>'; lastM=p.m; }
     var right = f.sold_out ? '<span class="chip chip-out">Sold out</span>'
-      : (f.from ? '<span class="price"><span class="lbl">From</span>'+fmt(f.from,f.currency)+'</span>'
-                : '<span class="chip">See options</span>');
+      : '<span class="price" id="price-'+f.id+'"><span class="lbl">From</span>'+(f.from?fmt(f.from,f.currency):'\u2026')+'</span>';
     h+='<a class="row" href="/event/?event='+f.id+'">'
       +'<div class="row-top"><span class="row-date">'+p.d+' &middot; '+p.t+'</span></div>'
       +'<div class="row-name">'+f.name+'</div>'
@@ -203,9 +202,33 @@ fetch("/.netlify/functions/tc-fixtures?competition=401",{signal:ctrl.signal})
    ALL=data.fixtures||[];
    if(!ALL.length){ listEl.innerHTML='<div class="state">No upcoming fixtures right now.</div>'; return; }
    render(ALL);
+   refreshRealPrices();
  })
  .catch(function(){ clearTimeout(timer);
    listEl.innerHTML='<div class="state">Fixtures are temporarily unavailable. Please <a href="/#contact" style="color:var(--accent)">get in touch</a>.</div>'; });
+
+function refreshRealPrices(){
+  var ids = ALL.filter(function(f){return !f.sold_out;}).map(function(f){return f.id;});
+  var byId = {}; ALL.forEach(function(f){ byId[f.id]=f; });
+  function chunk(arr,n){ var out=[]; for(var i=0;i<arr.length;i+=n) out.push(arr.slice(i,i+n)); return out; }
+  chunk(ids,12).forEach(function(group){
+    fetch("/.netlify/functions/tc-prices?products="+group.join(","))
+      .then(function(r){return r.json();})
+      .then(function(d){
+        (d.products||[]).forEach(function(pr){
+          var f = byId[pr.id]; if(!f) return;
+          if(pr.sold_out){ f.sold_out=true; f.from=null; }
+          else if(pr.from!=null){ f.from=pr.from; f.currency=pr.currency||f.currency; }
+          var el = document.getElementById("price-"+pr.id);
+          if(el){
+            if(f.sold_out) el.outerHTML='<span class="chip chip-out">Sold out</span>';
+            else el.innerHTML='<span class="lbl">From</span>'+fmt(f.from,f.currency);
+          }
+        });
+      })
+      .catch(function(){/* leave the cached estimate if this fails */});
+  });
+}
 </script>
 </body>
 </html>
