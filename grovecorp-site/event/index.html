@@ -280,13 +280,10 @@ else fetch("/.netlify/functions/tc-prices?products="+encodeURIComponent(eventId)
 
    // Location map — secondary, smaller
    if(p.venue && p.venue.lat && p.venue.lng){
-     var la=p.venue.lat, ln=p.venue.lng, dd=0.008;
-     var bbox=(ln-dd)+","+(la-dd/2)+","+(ln+dd)+","+(la+dd/2);
-     var osm="https://www.openstreetmap.org/export/embed.html?bbox="+bbox+"&layer=mapnik&marker="+la+","+ln;
+     var la=p.venue.lat, ln=p.venue.lng;
      var gmaps="https://www.google.com/maps/search/?api=1&query="+la+","+ln;
-     var mc=document.createElement('div'); mc.className='card mapcard'; mc.style.marginTop='14px'; mc.style.padding='0';
-     mc.innerHTML='<iframe class="map" loading="lazy" src="'+osm+'"></iframe>'
-       +'<div style="padding:14px 16px"><h3 style="margin:0">'+(p.venue.name||"Stadium")+'</h3>'
+     var mc=document.createElement('div'); mc.className='card mapcard'; mc.style.marginTop='14px';
+     mc.innerHTML='<div style="padding:14px 16px"><h3 style="margin:0">'+(p.venue.name||"Stadium")+'</h3>'
        +'<div class="venue-addr">'+(p.venue.address||"")+' &middot; <a href="'+gmaps+'" target="_blank" rel="noopener" style="color:var(--blue)">Open in Maps &rarr;</a></div></div>';
      document.getElementById("mapwrap").appendChild(mc);
    }
